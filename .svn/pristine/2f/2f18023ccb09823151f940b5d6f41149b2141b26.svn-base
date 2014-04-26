@@ -1,0 +1,25 @@
+package br.ufrj.cc.aleph.service;
+
+import org.springframework.stereotype.Service;
+
+import br.ufrj.cc.aleph.controller.form.BeaconForm;
+import br.ufrj.cc.aleph.domain.UserRequest;
+
+@Service
+public class PrologService {
+	
+	public static Runnable r = ThreadHelper.getInstance();
+	
+	public void executeShellScript( final BeaconForm beaconForm){
+		
+		ThreadHelper.userRequestQueue.add( new UserRequest( beaconForm.getEmail(), beaconForm.getName() ) );
+		
+		Thread thr = new Thread(r);
+		thr.start();		
+	}
+	
+	public void sendUserRequestEmail() {
+		
+	}
+	
+}

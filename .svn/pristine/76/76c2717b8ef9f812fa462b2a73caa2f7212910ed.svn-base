@@ -1,0 +1,59 @@
+package br.ufrj.cc.aleph.controller.form;
+
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+public class BeaconForm {	
+	
+	private String email;
+	
+	private String name;
+	
+	private CommonsMultipartFile arqb;
+	
+	private CommonsMultipartFile arqf;
+	
+	private CommonsMultipartFile arqn;
+
+	public String getEmail() {
+		
+		return email;
+	}
+
+	public void setEmail( final String email ) {
+		this.email = email;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName( final String name ) {
+		this.name = name;
+	}
+
+	public CommonsMultipartFile getArqb() {
+		return arqb;
+	}
+
+	public void setArqb(CommonsMultipartFile arqb) {
+		this.arqb = arqb;
+	}
+
+	public CommonsMultipartFile getArqf() {
+		return arqf;
+	}
+
+	public void setArqf(CommonsMultipartFile arqf) {
+		this.arqf = arqf;
+	}
+
+	public CommonsMultipartFile getArqn() {
+		return arqn;
+	}
+
+	public void setArqn(CommonsMultipartFile arqn) {
+		this.arqn = arqn;
+	}
+	
+	
+}

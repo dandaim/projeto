@@ -1,0 +1,47 @@
+package br.ufrj.cc.aleph.helper;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class StorageHelper {
+	
+	public static String commonPath = "/home/daniel/pacote/";
+	
+	public static String alephPath = "/home/daniel/uw_aleph/";
+	
+	public static String generateTemplate( final String userName, final String userEmail ) {
+		
+		String pathFolder = commonPath + Md5Helper.md5( userEmail + userName );
+		
+		try {
+			
+			FileWriter outFile = new FileWriter( pathFolder + "/script.sh" );
+			PrintWriter out = new PrintWriter( outFile );
+			
+			out.print( "string=\"cd('" + alephPath + "\')." );
+			out.print( " [aleph]." );
+			out.print( " cd('" + pathFolder + "')." );
+			out.print( " read_all(arqb, arqf, arqn)." );
+			out.print( " induce." );
+			out.println( " halt.\"" );
+			out.println(" sudo yap <<< $string");
+			out.println(" exit 0" );
+			out.close();
+			
+		} catch ( IOException e ) {
+			
+			e.printStackTrace();
+			
+		}
+		
+		return pathFolder + "/script.sh";
+		
+	}
+	
+	public static void main( String[] args ) {
+		
+		generateTemplate( "daim", "dd@gmail.com" );
+	}
+	
+}

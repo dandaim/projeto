@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+    
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Welcome</title>
+	</head> 
+	<body>
+		<c:url value="/showMessage.html" var="messageUrl" />
+		<c:out value="Formulário de teste. Aleph." />
+		<form:form method="post" modelAttribute="beaconForm" enctype="multipart/form-data" >
+			<table>
+				<tr>
+					<td><label>Email</label></td>
+					<td><form:input type="text" name="email" path="email" /></td>
+				</tr>
+				<tr>
+					<td><label>Nome</label></td>
+					<td><form:input type="text" name="name" path="name" /></td>
+				</tr>
+				<tr>
+					<td><label>Arquivo Base</label></td>
+					<td><form:input type="file" name="arqb" path="arqb" /></td>
+				</tr>
+				<tr>
+					<td><label>Arquivo Exemplos Positivos </label></td>
+					<td><form:input type="file" name="arqf" path="arqf" /></td>
+				</tr>
+				<tr>
+					<td><label>Arquivo Exemplos Negativos</label></td>
+					<td><form:input type="file" name="arqn" path="arqn" /></td>
+				</tr>
+			</table>
+			<input type="submit" />
+		</form:form>
+	</body>
+</html>

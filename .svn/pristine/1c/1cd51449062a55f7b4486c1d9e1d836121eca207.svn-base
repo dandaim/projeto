@@ -1,0 +1,67 @@
+package br.ufrj.cc.aleph.service;
+
+import java.io.File;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
+
+import br.ufrj.cc.aleph.controller.form.BeaconForm;
+import br.ufrj.cc.aleph.domain.UserRequest;
+import br.ufrj.cc.aleph.helper.MailHelper;
+import br.ufrj.cc.aleph.helper.Md5Helper;
+import br.ufrj.cc.aleph.helper.StorageHelper;
+
+@Service
+public class PrologService {
+	
+	public static Runnable r = ThreadHelper.getInstance();
+	
+	public void executeShellScript( final BeaconForm beaconForm ){
+		
+		ThreadHelper.userRequestQueue.add( new UserRequest( beaconForm.getEmail(), beaconForm.getName() ) );
+		
+		String pathFolder = StorageHelper.commonPath + Md5Helper.md5( beaconForm.getEmail() + beaconForm.getName() );
+		
+		File file = new File( pathFolder );
+		
+		try {
+			
+			if( file.mkdirs() ) {
+				
+				File arqB = new File( pathFolder + "/" + beaconForm.getArqb().getName() + ".b" );
+				File arqF = new File( pathFolder + "/" + beaconForm.getArqf().getName() + ".f");
+				File arqN = new File( pathFolder + "/" + beaconForm.getArqn().getName() + ".n");
+				
+				beaconForm.getArqb().transferTo( arqB );
+				beaconForm.getArqf().transferTo( arqF );
+				beaconForm.getArqn().transferTo( arqN );
+				
+			} else {
+				
+				beaconForm.getArqb().transferTo( file );
+				beaconForm.getArqf().transferTo( file );
+				beaconForm.getArqn().transferTo( file );
+			}
+			
+		} catch( Exception e ) {
+			
+		}
+		
+		
+		ApplicationContext context =  new ClassPathXmlApplicationContext("classpath:spring/mail.xml");
+		
+		//MailHelper mailHelper = (MailHelper) context.getBean( "mailHelper" );
+		
+		//mailHelper.sendEmail( "dandaim@gmail.com", "teste", "teste" );
+		 
+		
+		Thread thr = new Thread(r);
+		thr.start();		
+	}
+	
+	public void sendUserRequestEmail() {
+		
+	}
+	
+}

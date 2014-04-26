@@ -1,0 +1,53 @@
+package br.ufrj.cc.aleph.helper;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class StorageHelper {
+	
+	public static String commonPath = "/home/daniel/pacote/";
+	
+	public static String alephPath = "/home/daniel/uw_aleph/";
+	
+	public static String generateTemplate( final String userName, final String userEmail, final int numFiles ) {
+		
+		String pathFolder = commonPath + Md5Helper.md5( userEmail + userName );
+		
+		try {
+			
+			FileWriter outFile = new FileWriter( pathFolder + "/script.sh" );
+			PrintWriter out = new PrintWriter( outFile );
+			
+			out.print( "string=\"cd('" + alephPath + "\')." );
+			out.print( " [aleph]." );
+			out.print( " cd('" + pathFolder + "')." );
+			
+			//Adicionando leitura de todos os arquivos na execução do script
+			for( int i = 0; i < numFiles; i++ ) {
+				
+				out.print( " read_all(arqb" + i +", arqpos" + i + ", arqneg" + i + ")." );
+				out.print( " induce." );
+			}			
+			
+			out.println( " halt.\"" );
+			out.println(" sudo yap <<< $string");
+			out.println(" exit 0" );
+			out.close();
+						
+			File file = new File( pathFolder + "/script.sh" );
+			file.setExecutable( true );
+			file.setReadable( true );
+			
+		} catch ( IOException e ) {
+			
+			e.printStackTrace();
+			
+		}
+		
+		return pathFolder + "/script.sh";
+		
+	}
+	
+}

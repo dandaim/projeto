@@ -1,0 +1,35 @@
+package br.ufrj.cc.aleph.service;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
+
+import br.ufrj.cc.aleph.controller.form.BeaconForm;
+import br.ufrj.cc.aleph.domain.UserRequest;
+import br.ufrj.cc.aleph.helper.MailHelper;
+
+@Service
+public class PrologService {
+	
+	public static Runnable r = ThreadHelper.getInstance();
+	
+	public void executeShellScript( final BeaconForm beaconForm){
+		
+		ThreadHelper.userRequestQueue.add( new UserRequest( beaconForm.getEmail(), beaconForm.getName() ) );
+		
+		ApplicationContext context =  new ClassPathXmlApplicationContext("classpath:spring/mail.xml");
+		
+		MailHelper mailHelper = (MailHelper) context.getBean( "mailHelper" );
+		
+		mailHelper.sendEmail( "dandaim@gmail.com", "teste", "teste" );
+		 
+		
+		//Thread thr = new Thread(r);
+		//thr.start();		
+	}
+	
+	public void sendUserRequestEmail() {
+		
+	}
+	
+}

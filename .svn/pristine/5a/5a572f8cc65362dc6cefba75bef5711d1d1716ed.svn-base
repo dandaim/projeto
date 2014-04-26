@@ -1,0 +1,50 @@
+package br.ufrj.cc.aleph.service;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.Semaphore;
+
+import br.ufrj.cc.aleph.domain.UserRequest;
+
+public class ThreadHelper implements Runnable {
+	
+	private static ThreadHelper instance = new ThreadHelper();
+	
+	public ThreadHelper() {
+		
+	}
+	
+	public static ThreadHelper getInstance() {
+		return instance;
+	}
+	
+	public static Queue<UserRequest> userRequestQueue = new LinkedList<UserRequest>();
+	private static Semaphore semaforo = new Semaphore(1);
+	
+	public void run() {
+		
+		try {
+			semaforo.acquire();
+			UserRequest userRequest = userRequestQueue.poll();
+									
+			System.out.println( userRequest.getEmail() );
+			
+			for( int i = 0; i < 5; i++ ) {
+				ProcessBuilder pb = new ProcessBuilder("play", "/home/daniel/scripts/ray.wav");
+				 
+				Process p = pb.start();
+				p.waitFor();
+			}
+			
+			semaforo.release();
+			 
+		} catch ( IOException e ) {
+			
+			e.printStackTrace();
+		} catch ( InterruptedException e ) {
+			
+			e.printStackTrace();
+		}		
+	}	
+}

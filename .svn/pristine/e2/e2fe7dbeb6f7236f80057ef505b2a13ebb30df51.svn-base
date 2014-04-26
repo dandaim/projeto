@@ -1,0 +1,67 @@
+package br.ufrj.cc.aleph.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import br.ufrj.cc.aleph.controller.form.BeaconForm;
+import br.ufrj.cc.aleph.controller.validator.BeaconValidator;
+import br.ufrj.cc.aleph.service.PrologService;
+
+@Controller
+@RequestMapping("/home")
+public class MainController {
+	
+	@Autowired
+	private PrologService prologService;
+	
+	@Autowired
+	private BeaconValidator beaconValidator;
+	
+	
+	@InitBinder
+	private void initBinder( final WebDataBinder binder ) {
+		
+		binder.setValidator( beaconValidator );
+	}
+	
+	@RequestMapping( method = RequestMethod.GET )	
+	public void showIndex( final Model model ) {
+		
+		BeaconForm form = new BeaconForm();
+		
+		model.addAttribute( "beaconForm", form );		
+	}
+	
+	@RequestMapping( method = RequestMethod.POST )
+	public void callService( @ModelAttribute("beaconForm") @Valid BeaconForm beaconForm, final Model model, final HttpServletRequest request,
+			final BindingResult result ) {
+		
+		//beaconValidator.validate( beaconForm, result );
+		
+		if( result.hasErrors() ) {
+			
+			return;
+		}
+		
+		
+		try {
+							
+			//prologService.executeShellScript( beaconForm );
+			
+		} catch ( Exception e ) {
+			
+		}		
+	}
+	
+}

@@ -1,0 +1,41 @@
+package br.ufrj.cc.aleph.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import br.ufrj.cc.aleph.controller.form.BeaconForm;
+import br.ufrj.cc.aleph.service.PrologService;
+
+@Controller
+@RequestMapping("/home")
+public class MainController {
+	
+	@Autowired
+	private PrologService prologService;
+	
+	@RequestMapping( method = RequestMethod.GET )
+	public void showIndex( final Model model ) {
+		
+		BeaconForm form = new BeaconForm();
+		
+		model.addAttribute( "beaconForm", form );		
+		model.addAttribute( "teste", "teste" );
+	}
+	
+	@RequestMapping( method = RequestMethod.POST )
+	public void callService( @ModelAttribute("beaconForm") BeaconForm beaconForm, final Model model ) {
+		
+		try {
+			
+			prologService.executeShellScript( beaconForm );
+			
+		} catch ( Exception e ) {
+			
+		}		
+	}
+	
+}
