@@ -35,7 +35,7 @@
 					</div>
 					<br/><br/>
 					<div class="col-sm-5 col-sm-offset-3">
-						<a href="/projeto/home"><button type="button" class="btn btn-primary btn-lg btn-block">Click here to start</button></a>
+						<a href="/home"><button type="button" class="btn btn-primary btn-lg btn-block">Click here to start</button></a>
 					</div>
 				</div>
 			</div>
