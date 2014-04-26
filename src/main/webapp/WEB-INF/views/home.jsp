@@ -30,7 +30,7 @@
 					<h3>Enter data for processing</h3>
 				</div>
 				<div class="row">
-					<form:form method="post" action="/projeto/home/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
+					<form:form method="post" action="/home/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
 						<div class="form-group" >
 							<label for="email" class="col-sm-2 control-label">Email</label>
 							<div class="col-sm-5">
