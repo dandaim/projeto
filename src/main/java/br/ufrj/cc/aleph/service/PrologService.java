@@ -22,188 +22,242 @@ import br.ufrj.cc.aleph.helper.StorageHelper;
 
 @Service
 public class PrologService {
-	
+
 	public static Runnable r = ThreadHelper.getInstance();
-	
-	public void executeShellScript( final BeaconForm beaconForm ){		
-		
-		String pathFolder = StorageHelper.commonPath + Md5Helper.md5( beaconForm.getEmail() );
-		
-		String nextFolder = "/" + StorageHelper.getNextPath( Md5Helper.md5( beaconForm.getEmail() ) );
-		
+
+	public void executeShellScript( final BeaconForm beaconForm ) {
+
+		String pathFolder = StorageHelper.commonPath
+				+ Md5Helper.md5( beaconForm.getEmail() );
+
+		String nextFolder = "/"
+				+ StorageHelper.getNextPath( Md5Helper.md5( beaconForm
+						.getEmail() ) );
+
 		pathFolder += nextFolder;
-		
+
 		File file = new File( pathFolder );
-		
+
 		int files = 0;
-		
+
 		try {
-			
-			if( file.mkdirs() ) {
-				
+
+			System.out.println( "Pasta a ser criada: " + pathFolder );
+
+			System.out.println( "Vou verificar se o arquivo existe" );
+
+			if ( file.mkdirs() ) {
+
+				System.out.println( "Consegui criar a pasta" );
+
 				for ( int i = 0; i < beaconForm.getArqpos().length; i++ ) {
-					
-					if( beaconForm.getArqpos()[i].getSize() > 0 ) {
-						
+
+					if ( beaconForm.getArqpos()[i].getSize() > 0 ) {
+
 						files++;
-						
+
 						generateFileB( beaconForm, pathFolder, i );
-						
-						generateFoldPos( beaconForm, beaconForm.getArqpos()[i], pathFolder, i );
-						
-						if( beaconForm.getArqneg() != null ) {						
-							generateFoldNeg( beaconForm, beaconForm.getArqneg()[i], pathFolder, i );
+
+						generateFoldPos( beaconForm, beaconForm.getArqpos()[i],
+								pathFolder, i );
+
+						if ( beaconForm.getArqneg() != null ) {
+							generateFoldNeg( beaconForm,
+									beaconForm.getArqneg()[i], pathFolder, i );
 						}
-					}					
+
+					}
 				}
-				
+
 			} else {
-				
+
+				System.out.println( "Já existe a pasta" );
+
 				for ( int i = 0; i < beaconForm.getArqpos().length; i++ ) {
-					
-					if( beaconForm.getArqpos()[i].getSize() > 0 ) {
-						
+
+					if ( beaconForm.getArqpos()[i].getSize() > 0 ) {
+
 						files++;
-						
-						generateFoldPos( beaconForm, beaconForm.getArqpos()[i], pathFolder, i );
-						
-						if( beaconForm.getArqneg() != null ) {						
-							generateFoldNeg( beaconForm, beaconForm.getArqneg()[i], pathFolder, i );
+
+						generateFileB( beaconForm, pathFolder, i );
+
+						generateFoldPos( beaconForm, beaconForm.getArqpos()[i],
+								pathFolder, i );
+
+						if ( beaconForm.getArqneg() != null ) {
+							generateFoldNeg( beaconForm,
+									beaconForm.getArqneg()[i], pathFolder, i );
 						}
-					}				
+					}
 				}
 			}
-			
-			ThreadHelper.userRequestQueue.add( new UserRequest( beaconForm.getEmail(), beaconForm.getName(), files, pathFolder ) );
-			
-		} catch( Exception e ) {
-			
+
+			if ( beaconForm.getArqopt() != null ) {
+
+				generateArqOpt( beaconForm, pathFolder );
+			}
+
+			ThreadHelper.userRequestQueue.add( new UserRequest( beaconForm
+					.getEmail(), beaconForm.getName(), files, pathFolder ) );
+
+		} catch ( Exception e ) {
+
+			System.out
+					.println( "Erro na classe PrologService ao executar o método executeShellScript" );
+			System.out.println( "Erro: " + e.getMessage() );
+
 		}
-		
-		
-		ApplicationContext context =  new ClassPathXmlApplicationContext("classpath:spring/mail.xml");
-		
-		MailHelper mailHelper = (MailHelper) context.getBean( "mailHelper" );
-		
-		//mailHelper.sendEmail( beaconForm.getEmail(), "teste", MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
-		 
-		
-		Thread thr = new Thread(r);
-		thr.start();		
+
+		System.out.println( "Adicionei a requisição na fila" );
+
+		ApplicationContext context = new ClassPathXmlApplicationContext(
+				"classpath:spring/mail.xml" );
+
+		MailHelper mailHelper = ( MailHelper ) context.getBean( "mailHelper" );
+
+		mailHelper.sendEmail( beaconForm.getEmail(), "teste",
+				MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
+
+		Thread thr = new Thread( r );
+		thr.start();
 	}
-	
+
 	public void sendUserRequestEmail() {
-		
+
 	}
-	
-	private void generateFileB( final BeaconForm beaconForm, final String pathFolder, final int index ) throws IOException {
-		
-		File arquivo = new File( pathFolder + "/" + beaconForm.getArqb().getName() + index + ".b" );
+
+	private void generateFileB( final BeaconForm beaconForm,
+			final String pathFolder, final int index ) throws IOException {
+
+		File arquivo = new File( pathFolder + "/"
+				+ beaconForm.getArqb().getName() + index + ".b" );
 		arquivo.createNewFile();
-		
-		 FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
-		 BufferedWriter bw = new BufferedWriter(fw);
-		 
+
+		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
+		BufferedWriter bw = new BufferedWriter( fw );
+
 		String conteudo = "";
-		
-		InputStream input =  beaconForm.getArqb().getInputStream();
-			
+
+		InputStream input = beaconForm.getArqb().getInputStream();
+
 		conteudo += getStringFromInputStream( input );
-		conteudo += "\n:- set(test_pos,'arqpos"+ index +".f').";
-		conteudo += "\n:- set(test_neg,'arqneg"+ index +".n').";
-			
+		conteudo += "\n:- set(test_pos,'arqpos" + index + ".f').";
+		conteudo += "\n:- set(test_neg,'arqneg" + index + ".n').";
+
 		input.close();
-			
+
 		bw.write( conteudo );
 		bw.close();
 		fw.close();
 	}
-	
-	private void generateFoldPos ( final BeaconForm beaconForm, final CommonsMultipartFile file, final String pathFolder, final int index ) throws IOException {
-		
-		 File arquivo = new File( pathFolder + "/" + beaconForm.getArqpos()[index].getName() + index + ".f" );
-		 arquivo.createNewFile();
-		 
-		 FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
-		 BufferedWriter bw = new BufferedWriter(fw);
-		 
-		 String conteudo = "";
-		 
-		 for( int j = 0; j < beaconForm.getArqpos().length; j++ ) {
-			 
-			 if( beaconForm.getArqpos()[j].getSize() > 0 ) {
-				 
-				 if( index != j ) {
-						
-						InputStream input =  beaconForm.getArqpos()[j].getInputStream();
-						
-						conteudo += getStringFromInputStream( input );
-						
-						input.close();
-				 }	
-			 }			 		 			 
-		 }
-		
-		 bw.write( conteudo );
-		 bw.close();
-		 fw.close();		
+
+	private void generateArqOpt( final BeaconForm beaconForm,
+			final String pathFolder ) throws IOException {
+
+		for ( CommonsMultipartFile file : beaconForm.getArqopt() ) {
+
+			File arquivo = new File( pathFolder + "/"
+					+ file.getOriginalFilename() );
+			arquivo.createNewFile();
+
+			file.transferTo( arquivo );
+
+		}
 	}
-	
-	private void generateFoldNeg ( final BeaconForm beaconForm, final CommonsMultipartFile file, final String pathFolder, final int index ) throws IOException {
-		
-		 File arquivo = new File( pathFolder + "/" + beaconForm.getArqneg()[index].getName() + index + ".n" );
-		 arquivo.createNewFile();
-		 
-		 FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
-		 BufferedWriter bw = new BufferedWriter(fw);
-		 
-		 String conteudo = "";
-		 
-		 for( int j = 0; j < beaconForm.getArqneg().length; j++ ) {
-			 
-			 if( beaconForm.getArqneg()[j].getSize() > 0 ) {
-				 
-				 if( index != j ) {
-						
-						InputStream input =  beaconForm.getArqneg()[j].getInputStream();
-						
-						conteudo += getStringFromInputStream( input );
-						
-						input.close();
-				 }	
-			 }			 
-			 		 			 
-		 }
-		
-		 bw.write( conteudo );
-		 bw.close();
-		 fw.close();		
+
+	private void generateFoldPos( final BeaconForm beaconForm,
+			final CommonsMultipartFile file, final String pathFolder,
+			final int index ) throws IOException {
+
+		File arquivo = new File( pathFolder + "/"
+				+ beaconForm.getArqpos()[index].getName() + index + ".f" );
+		arquivo.createNewFile();
+
+		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
+		BufferedWriter bw = new BufferedWriter( fw );
+
+		String conteudo = "";
+
+		for ( int j = 0; j < beaconForm.getArqpos().length; j++ ) {
+
+			if ( beaconForm.getArqpos()[j].getSize() > 0 ) {
+
+				if ( index != j ) {
+
+					InputStream input = beaconForm.getArqpos()[j]
+							.getInputStream();
+
+					conteudo += getStringFromInputStream( input );
+
+					input.close();
+				}
+			}
+		}
+
+		bw.write( conteudo );
+		bw.close();
+		fw.close();
 	}
-	
+
+	private void generateFoldNeg( final BeaconForm beaconForm,
+			final CommonsMultipartFile file, final String pathFolder,
+			final int index ) throws IOException {
+
+		File arquivo = new File( pathFolder + "/"
+				+ beaconForm.getArqneg()[index].getName() + index + ".n" );
+		arquivo.createNewFile();
+
+		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
+		BufferedWriter bw = new BufferedWriter( fw );
+
+		String conteudo = "";
+
+		for ( int j = 0; j < beaconForm.getArqneg().length; j++ ) {
+
+			if ( beaconForm.getArqneg()[j].getSize() > 0 ) {
+
+				if ( index != j ) {
+
+					InputStream input = beaconForm.getArqneg()[j]
+							.getInputStream();
+
+					conteudo += getStringFromInputStream( input );
+
+					input.close();
+				}
+			}
+
+		}
+
+		bw.write( conteudo );
+		bw.close();
+		fw.close();
+	}
+
 	private static String getStringFromInputStream( final InputStream is ) {
-		 
+
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
- 
+
 		String line;
 		try {
- 
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-				sb.append( line + "\n");
+
+			br = new BufferedReader( new InputStreamReader( is ) );
+			while ( ( line = br.readLine() ) != null ) {
+				sb.append( line + "\n" );
 			}
- 
-		} catch (IOException e) {
+
+		} catch ( IOException e ) {
 			e.printStackTrace();
 		} finally {
-			if (br != null) {
+			if ( br != null ) {
 				try {
 					br.close();
-				} catch ( IOException e) {
+				} catch ( IOException e ) {
 					e.printStackTrace();
 				}
 			}
-		} 
-		return sb.toString(); 
-	}	
+		}
+		return sb.toString();
+	}
 }

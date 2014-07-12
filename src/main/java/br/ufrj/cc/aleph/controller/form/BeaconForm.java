@@ -1,23 +1,23 @@
 package br.ufrj.cc.aleph.controller.form;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-public class BeaconForm {	
-	
+public class BeaconForm {
+
 	private String email;
-	
+
 	private String name;
-	
+
 	private CommonsMultipartFile arqb;
-	
+
 	private CommonsMultipartFile[] arqpos;
-	
+
 	private CommonsMultipartFile[] arqneg;
 
+	private CommonsMultipartFile[] arqopt;
+
 	public String getEmail() {
-		
+
 		return email;
 	}
 
@@ -37,7 +37,7 @@ public class BeaconForm {
 		return arqb;
 	}
 
-	public void setArqb(CommonsMultipartFile arqb) {
+	public void setArqb( CommonsMultipartFile arqb ) {
 		this.arqb = arqb;
 	}
 
@@ -45,7 +45,7 @@ public class BeaconForm {
 		return arqpos;
 	}
 
-	public void setArqpos(CommonsMultipartFile[] arqpos) {
+	public void setArqpos( CommonsMultipartFile[] arqpos ) {
 		this.arqpos = arqpos;
 	}
 
@@ -53,9 +53,16 @@ public class BeaconForm {
 		return arqneg;
 	}
 
-	public void setArqneg(CommonsMultipartFile[] arqneg) {
+	public void setArqneg( CommonsMultipartFile[] arqneg ) {
 		this.arqneg = arqneg;
 	}
-	
-	
+
+	public CommonsMultipartFile[] getArqopt() {
+		return arqopt;
+	}
+
+	public void setArqopt( CommonsMultipartFile[] arqopt ) {
+		this.arqopt = arqopt;
+	}
+
 }

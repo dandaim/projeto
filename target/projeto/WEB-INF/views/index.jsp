@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+	<c:set var="context" value="${pageContext.request.contextPath}" />
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Welcome - DAHELE - UFRJ</title>
@@ -34,9 +35,15 @@
 						<p>Upon processing completion, a response is generated. This, being a success or a failure, will be forwarded to the email entered in the application form.</p>
 					</div>
 					<br/><br/>
-					<div class="col-sm-5 col-sm-offset-3">
-						<a href="/projeto/home"><button type="button" class="btn btn-primary btn-lg btn-block">Click here to start</button></a>
+					<div class="col-sm-3 col-sm-offset-2">
+						<label>To build a theory from aleph files click button below</label>
+						<a href="${context}/aleph"><button type="button" class="btn btn-primary btn-lg btn-block">Use aleph here</button></a>						
 					</div>
+					<div class="col-sm-3 col-sm-offset-1">
+						<label>To generate a triplets file click button below</label>
+						<a href="${context}/rdf"><button type="button" class="btn btn-primary btn-lg btn-block">Use rdf here</button></a>						
+					</div>
+
 				</div>
 			</div>
 		</div>

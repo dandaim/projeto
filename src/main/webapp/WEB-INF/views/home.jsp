@@ -6,6 +6,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<c:set var="context" value="${pageContext.request.contextPath}" />
+
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -30,7 +32,7 @@
 					<h3>Enter data for processing</h3>
 				</div>
 				<div class="row">
-					<form:form method="post" action="/home/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
+					<form:form method="post" action="${context}/home/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
 						<div class="form-group" >
 							<label for="email" class="col-sm-2 control-label">Email</label>
 							<div class="col-sm-5">
@@ -82,6 +84,18 @@
 								<form:input class="files" type="file" value="Choose Value" name="arqneg[]" path="arqneg" />
 								<form:input class="files" type="file" value="Choose Value" name="arqneg[]" path="arqneg" />
 							</div>							
+						</div>
+						<div class="form-group" id="optional">
+							<label class="col-sm-2 control-label">Optional files<span class="glyphicon glyphicon-info-sign" title="Load optional files here. Maximum of 10 files." ></span>
+							</label>
+							<div class="col-sm-10">
+								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-10 col-sm-offset-2">
