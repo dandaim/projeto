@@ -33,36 +33,52 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<form:form method="post" action="${context}/rdf/request" class="form-horizontal" modelAttribute="tripletsForm" enctype="multipart/form-data" >
-							<div class="form-group col-sm-2">
-								<div class="radio">
-								  <label>
-								    <form:radiobutton path="option" value="url" checked="checked"/>
-								    Use RDF from an url
-								  </label>
-								</div>
-								<div class="radio ">
-								  <label>
-								    <form:radiobutton path="option" value="file" />
-								    Use RDF from a file
-								  </label>
-								</div>
+							<div class="form-group " >
+								<label for="email" class="col-sm-1 control-label">Email</label>
+								<div class="col-sm-5">
+									<form:input type="email" id="email" class="form-control" placeholder="Enter email" name="email" path="email" />
+									<form:errors path="email" cssClass="error" />
+								</div>							
 							</div>
+							<div class="form-group" >
+								<label for="name" class="col-sm-1 control-label">Name</label>
+								<div class="col-sm-5">
+									<form:input type="text" id="name" class="form-control" placeholder="Enter name" name="name" path="name" />
+									<form:errors path="name" cssClass="error" />
+								</div>							
+							</div>
+							<div class="form-group">
+							    <div class="col-sm-offset-1 col-sm-10">
+							      	<div class="radio">
+									  <label>
+									    <form:radiobutton path="option" value="url" checked="checked"/>
+									    Use RDF from an url
+									  </label>								  
+									</div>
+									<div class="radio">
+									   <label>
+									    <form:radiobutton path="option" value="file" />
+									    Use RDF from a file
+									  </label>							  
+									</div>
+							    </div>
+						  	</div>						  						
 							<div class="url form-group" >
-								<label for="url" class="col-sm-2 control-label">Url</label>
+								<label for="url" class="col-sm-1 control-label">Url</label>
 								<div class="col-sm-5">
 									<form:input id="url" class="form-control" placeholder="Enter rdf's url here" name="url" path="url" />
 									<form:errors path="url" cssClass="error" />
 								</div>							
 							</div>											
 							<div class="file form-group">
-								<label for="file" class="col-sm-2 control-label">Rdf file<span class="glyphicon glyphicon-info-sign" title="Load your rdf file here."></span></label>
+								<label for="file" class="col-sm-1 control-label">Rdf file<span class="glyphicon glyphicon-info-sign" title="Load your rdf file here."></span></label>
 								<div class="col-sm-5">
 									<form:input id="file" type="file" value="Choose Value" name="file" path="file" />
 									<form:errors path="file" cssClass="error" />
 								</div>							
 							</div>
 							<div class="form-group">
-								<div class="col-sm-10">
+								<div class="col-sm-8 col-sm-offset-1">
 									<input type="submit" class="btn btn-danger" value="Send Data" />
 								</div>
 							</div>									

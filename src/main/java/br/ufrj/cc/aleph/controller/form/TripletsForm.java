@@ -6,6 +6,8 @@ public class TripletsForm {
 
 	private String option;
 	private String url;
+	private String email;
+	private String name;
 	private CommonsMultipartFile file;
 
 	public String getUrl() {
@@ -30,6 +32,22 @@ public class TripletsForm {
 
 	public void setOption( String option ) {
 		this.option = option;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail( String email ) {
+		this.email = email;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName( String name ) {
+		this.name = name;
 	}
 
 }

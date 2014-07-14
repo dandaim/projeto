@@ -234,7 +234,7 @@ public class PrologService {
 		fw.close();
 	}
 
-	private static String getStringFromInputStream( final InputStream is ) {
+	public static String getStringFromInputStream( final InputStream is ) {
 
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();

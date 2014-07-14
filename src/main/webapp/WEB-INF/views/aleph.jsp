@@ -16,7 +16,8 @@
 		<script>
 			
 			$(document).ready(function(){				
-				$(".files").hide();				
+				$(".files").hide();
+				$(".files-opt").hide();			
 			});		
 		</script>
 		<link href="<c:url value="/resources/css/bootstrap.min.css" />" rel="stylesheet" media="screen">
@@ -90,20 +91,35 @@
 							</label>
 							<div class="col-sm-10">
 								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
-								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
-								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
-								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
-								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
-								<form:input type="file" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
+								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-10 col-sm-offset-2">
 								<input type="button" id="btnadd" class="btn btn-primary" value="Add files" />
-								<input type="button" id="btnremove" class="btn btn-primary" value="Remove Files" />
-								<input type="submit" class="btn btn-danger" value="Send Data" />
+								<input type="button" id="btnremove" class="btn btn-primary" value="Remove Files" />	
 							</div>
-						</div>						
+							
+						</div>
+						<div class="form-group">
+							<div class="col-sm-10 col-sm-offset-2">
+								<input type="button" id="btnaddopt" class="btn btn-primary" value="Add Optional files" />
+								<input type="button" id="btnremoveopt" class="btn btn-primary" value="Remove Optional Files" />		
+							</div>
+						</div>	
+						<div class="form-group">
+							<div class="col-sm-10 col-sm-offset-2">
+								<input type="submit" class="btn btn-danger" value="Send Data" />
+							</div>					
+						</div>					
 					</form:form>
 				</div>
 			</div>
@@ -124,6 +140,7 @@
 					}					
 				});
 			});	
+
 			$("#btnremove").click(function(){
 				$("#rowpos .files").each( function(){					
 					if( $(this).is(":visible") ) {
@@ -137,6 +154,22 @@
 						return false;
 					}					
 				});
+			});	
+			$("#btnaddopt").click(function(){
+				$("#optional .files-opt").each( function(){					
+					if( !$(this).is(":visible") ) {
+						$(this).show();
+						return false;
+					}					
+				});					
+			});
+			$("#btnremoveopt").click(function(){
+				$("#optional .files-opt").each( function(){					
+					if( $(this).is(":visible") ) {
+						$(this).hide();
+						return false;
+					}					
+				});					
 			});	
 		</script>
 	</body>

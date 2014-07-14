@@ -57,4 +57,71 @@ public class StorageHelper {
 
 	}
 
+	public static String generateFileRdf( final String folder ) {
+
+		try {
+
+			FileWriter prolog = new FileWriter( folder + "/prolog.pl" );
+			PrintWriter outProlog = new PrintWriter( prolog );
+
+			outProlog.println( "ini:- open('" + folder
+					+ "/result.out',write,_,[alias(escrita)])," );
+			outProlog.println( "[library(rdf)]," );
+			outProlog.println( "load_rdf('" + folder + "/file.rdf', [H|T])," );
+			outProlog.println( "checklist(assert, [H|T])," );
+			outProlog.println( "ini1." );
+			outProlog.println( "ini:-close(escrita)." );
+			outProlog.println( "ini1:-" );
+			outProlog.println( "rdf(X,Y,Z)," );
+			outProlog.println( "escreve(X,Y,Z)," );
+			outProlog.println( "fail." );
+			outProlog.println( "escreve(X,Y,Z):-" );
+			outProlog.println( "write(escrita,':- ')," );
+			outProlog.println( "write(escrita,Y)," );
+			outProlog.println( "write(escrita,'(')," );
+			outProlog.println( "write(escrita,X)," );
+			outProlog.println( "write(escrita,',')," );
+			outProlog.println( "write(escrita,Z)," );
+			outProlog.println( "write(escrita,')')," );
+			outProlog.println( "write(escrita,'.')," );
+			outProlog.println( "nl(escrita)." );
+
+			outProlog.close();
+
+			FileWriter outFile = new FileWriter( folder + "/script.sh" );
+			PrintWriter out = new PrintWriter( outFile );
+
+			out.print( "string=\"['" + folder + "/prolog.pl']." );
+			out.print( " ini." );
+			out.println( " \"" );
+			out.println( " prolog <<< $string" );
+			out.close();
+
+			ProcessBuilder pb = new ProcessBuilder( "/bin/bash", folder
+					+ "/script.sh" );
+
+			Process p = pb.start();
+
+			synchronized ( p ) {
+
+				p.waitFor();
+			}
+
+		} catch ( IOException e ) {
+
+			System.out
+					.println( "Erro na classe StorageHelper no método generateTemplate" );
+
+			System.out.println( "Erro: " + e.getMessage() );
+			e.printStackTrace();
+
+		} catch ( InterruptedException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return folder + "/script.sh";
+
+	}
+
 }
