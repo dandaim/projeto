@@ -4,22 +4,35 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import javax.annotation.PostConstruct;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+@Component
 public class StorageHelper {
 
+	private static final Logger LOGGER = Logger.getLogger( StorageHelper.class );
+
 	// public static String commonPath = "/home/ec2-user/pacote/";
-	public static String commonPath = "/home/daniel/pacote/";
+	public static String commonPath;
 
 	// public static String alephPath = "/home/ec2-user/uw_aleph/";
-	public static String alephPath = "/home/daniel/uw_aleph/";
+	public static String alephPath;
+
+	@PostConstruct
+	public void setPaths() {
+
+		alephPath = System.getProperty( "aleph.path" );
+		commonPath = System.getProperty( "common.path" );
+
+	}
 
 	public static String getNextPath( String md5Email ) {
 
 		return String.valueOf( Calendar.getInstance().getTimeInMillis() );
 	}
 
-	public static String generateTemplate( final String userName,
-			final String userEmail, final int numFiles, final String folder ) {
+	public static String generateTemplate( final String userName, final String userEmail, final int numFiles, final String folder ) {
 
 		try {
 
@@ -33,8 +46,7 @@ public class StorageHelper {
 			// Adicionando leitura de todos os arquivos na execução do script
 			for ( int i = 0; i < numFiles; i++ ) {
 
-				out.print( " read_all(arqb" + i + ", arqpos" + i + ", arqneg"
-						+ i + ")." );
+				out.print( " read_all(arqb" + i + ", arqpos" + i + ", arqneg" + i + ")." );
 				out.print( " induce." );
 			}
 
@@ -45,8 +57,7 @@ public class StorageHelper {
 
 		} catch ( IOException e ) {
 
-			System.out
-					.println( "Erro na classe StorageHelper no método generateTemplate" );
+			System.out.println( "Erro na classe StorageHelper no método generateTemplate" );
 
 			System.out.println( "Erro: " + e.getMessage() );
 			e.printStackTrace();
@@ -57,15 +68,16 @@ public class StorageHelper {
 
 	}
 
-	public static String generateFileRdf( final String folder ) {
+	public static String generateFileRdf( final String folder, final String UUID ) throws Exception {
 
 		try {
+
+			LOGGER.info( "{" + UUID + "} -> Gerando o arquivo RDF na pasta: " + folder );
 
 			FileWriter prolog = new FileWriter( folder + "/prolog.pl" );
 			PrintWriter outProlog = new PrintWriter( prolog );
 
-			outProlog.println( "ini:- open('" + folder
-					+ "/result.out',write,_,[alias(escrita)])," );
+			outProlog.println( "ini:- open('" + folder + "/result.out',write,_,[alias(escrita)])," );
 			outProlog.println( "[library(rdf)]," );
 			outProlog.println( "load_rdf('" + folder + "/file.rdf', [H|T])," );
 			outProlog.println( "checklist(assert, [H|T])," );
@@ -97,8 +109,9 @@ public class StorageHelper {
 			out.println( " prolog <<< $string" );
 			out.close();
 
-			ProcessBuilder pb = new ProcessBuilder( "/bin/bash", folder
-					+ "/script.sh" );
+			LOGGER.info( "{" + UUID + "} -> Executando o script: gerador de resultado do rdf" );
+
+			ProcessBuilder pb = new ProcessBuilder( "/bin/bash", folder + "/script.sh" );
 
 			Process p = pb.start();
 
@@ -109,15 +122,13 @@ public class StorageHelper {
 
 		} catch ( IOException e ) {
 
-			System.out
-					.println( "Erro na classe StorageHelper no método generateTemplate" );
-
-			System.out.println( "Erro: " + e.getMessage() );
-			e.printStackTrace();
+			LOGGER.error( "{" + UUID + "} -> Erro de input ao gerar arquivo rdf: " + e.getMessage() );
+			throw new Exception( e );
 
 		} catch ( InterruptedException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			LOGGER.error( "{" + UUID + "} -> Erro de execução da thread do script rdf: " + e.getMessage() );
+			throw new Exception( e );
 		}
 
 		return folder + "/script.sh";

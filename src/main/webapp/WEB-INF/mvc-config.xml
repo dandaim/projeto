@@ -19,12 +19,14 @@
     <property name="suffix" value=".jsp"/>
   </bean>
   
- 	<bean id="multipartResolver"
- 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
- 		<!-- one of the properties available; the maximum file size in bytes -->
- 		<property name="maxUploadSize" value="10000000" />
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- one of the properties available; the maximum file size in bytes -->
+		<property name="maxUploadSize" value="10000000" />
 	</bean>
 	
+ 	<context:annotation-config />
+ 	
 	<mvc:resources mapping="/resources/**" location="/resources/" />
 	
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">

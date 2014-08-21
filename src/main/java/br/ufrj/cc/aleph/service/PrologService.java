@@ -7,12 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
 import br.ufrj.cc.aleph.controller.form.BeaconForm;
 import br.ufrj.cc.aleph.domain.UserRequest;
 import br.ufrj.cc.aleph.helper.MailContentEnum;
@@ -23,16 +22,15 @@ import br.ufrj.cc.aleph.helper.StorageHelper;
 @Service
 public class PrologService {
 
+	private static final Logger LOGGER = Logger.getLogger( PrologService.class );
+
 	public static Runnable r = ThreadHelper.getInstance();
 
-	public void executeShellScript( final BeaconForm beaconForm ) {
+	public void executeShellScript( final BeaconForm beaconForm, String UUID ) throws Exception {
 
-		String pathFolder = StorageHelper.commonPath
-				+ Md5Helper.md5( beaconForm.getEmail() );
+		String pathFolder = StorageHelper.commonPath + Md5Helper.md5( beaconForm.getEmail() );
 
-		String nextFolder = "/"
-				+ StorageHelper.getNextPath( Md5Helper.md5( beaconForm
-						.getEmail() ) );
+		String nextFolder = "/" + StorageHelper.getNextPath( Md5Helper.md5( beaconForm.getEmail() ) );
 
 		pathFolder += nextFolder;
 
@@ -42,81 +40,56 @@ public class PrologService {
 
 		try {
 
-			System.out.println( "Pasta a ser criada: " + pathFolder );
+			LOGGER.info( "{" + UUID + "} -> Pasta a ser criada: " + pathFolder );
 
-			System.out.println( "Vou verificar se o arquivo existe" );
+			LOGGER.info( "{" + UUID + "} -> Vou criar a pasta caso não exista: " + pathFolder );
 
-			if ( file.mkdirs() ) {
+			file.mkdirs();
 
-				System.out.println( "Consegui criar a pasta" );
+			for ( int i = 0; i < beaconForm.getArqpos().length; i++ ) {
 
-				for ( int i = 0; i < beaconForm.getArqpos().length; i++ ) {
+				if ( beaconForm.getArqpos()[i].getSize() > 0 ) {
 
-					if ( beaconForm.getArqpos()[i].getSize() > 0 ) {
+					files++;
 
-						files++;
+					generateFileB( beaconForm, pathFolder, i, UUID );
 
-						generateFileB( beaconForm, pathFolder, i );
+					generateFoldPos( beaconForm, beaconForm.getArqpos()[i], pathFolder, i, UUID );
 
-						generateFoldPos( beaconForm, beaconForm.getArqpos()[i],
-								pathFolder, i );
-
-						if ( beaconForm.getArqneg() != null ) {
-							generateFoldNeg( beaconForm,
-									beaconForm.getArqneg()[i], pathFolder, i );
-						}
-
+					if ( beaconForm.getArqneg() != null ) {
+						generateFoldNeg( beaconForm, beaconForm.getArqneg()[i], pathFolder, i, UUID );
 					}
-				}
 
-			} else {
-
-				System.out.println( "Já existe a pasta" );
-
-				for ( int i = 0; i < beaconForm.getArqpos().length; i++ ) {
-
-					if ( beaconForm.getArqpos()[i].getSize() > 0 ) {
-
-						files++;
-
-						generateFileB( beaconForm, pathFolder, i );
-
-						generateFoldPos( beaconForm, beaconForm.getArqpos()[i],
-								pathFolder, i );
-
-						if ( beaconForm.getArqneg() != null ) {
-							generateFoldNeg( beaconForm,
-									beaconForm.getArqneg()[i], pathFolder, i );
-						}
-					}
 				}
 			}
 
 			if ( beaconForm.getArqopt() != null ) {
 
-				generateArqOpt( beaconForm, pathFolder );
+				generateArqOpt( beaconForm, pathFolder, UUID );
 			}
 
-			ThreadHelper.userRequestQueue.add( new UserRequest( beaconForm
-					.getEmail(), beaconForm.getName(), files, pathFolder ) );
+			UserRequest userRequest = new UserRequest( beaconForm.getEmail(), beaconForm.getName(), files, pathFolder );
 
-		} catch ( Exception e ) {
+			LOGGER.info( "{" + UUID + "} -> Adicionando a requisição na fila: " );
 
-			System.out
-					.println( "Erro na classe PrologService ao executar o método executeShellScript" );
-			System.out.println( "Erro: " + e.getMessage() );
+			ThreadHelper.userRequestQueue.add( userRequest );
+
+		} catch ( IOException e ) {
+
+			LOGGER.error( "{" + UUID + "} -> Erro gerando arquivos: " + e.getMessage() );
+			throw new Exception( e );
 
 		}
 
-		System.out.println( "Adicionei a requisição na fila" );
+		LOGGER.info( "{" + UUID + "} -> Enviando email para o usuário: " + beaconForm.getEmail() );
 
-		ApplicationContext context = new ClassPathXmlApplicationContext(
-				"classpath:spring/mail.xml" );
+		ApplicationContext context = new ClassPathXmlApplicationContext( "classpath:spring/mail.xml" );
 
-		MailHelper mailHelper = ( MailHelper ) context.getBean( "mailHelper" );
+		MailHelper mailHelper = (MailHelper) context.getBean( "mailHelper" );
 
-		mailHelper.sendEmail( beaconForm.getEmail(), "teste",
-				MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
+		mailHelper.sendEmail( beaconForm.getEmail(), "teste", MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
+
+		LOGGER.info( "{" + UUID + "} -> Iniciando a thread da requisição." );
 
 		Thread thr = new Thread( r );
 		thr.start();
@@ -126,11 +99,11 @@ public class PrologService {
 
 	}
 
-	private void generateFileB( final BeaconForm beaconForm,
-			final String pathFolder, final int index ) throws IOException {
+	private void generateFileB( final BeaconForm beaconForm, final String pathFolder, final int index, final String UUID ) throws IOException {
 
-		File arquivo = new File( pathFolder + "/"
-				+ beaconForm.getArqb().getName() + index + ".b" );
+		LOGGER.info( "{" + UUID + "} -> Criando arquivo B: " + beaconForm );
+
+		File arquivo = new File( pathFolder + "/" + beaconForm.getArqb().getName() + index + ".b" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -140,7 +113,7 @@ public class PrologService {
 
 		InputStream input = beaconForm.getArqb().getInputStream();
 
-		conteudo += getStringFromInputStream( input );
+		conteudo += getStringFromInputStream( input, UUID );
 		conteudo += "\n:- set(test_pos,'arqpos" + index + ".f').";
 		conteudo += "\n:- set(test_neg,'arqneg" + index + ".n').";
 
@@ -151,13 +124,13 @@ public class PrologService {
 		fw.close();
 	}
 
-	private void generateArqOpt( final BeaconForm beaconForm,
-			final String pathFolder ) throws IOException {
+	private void generateArqOpt( final BeaconForm beaconForm, final String pathFolder, final String UUID ) throws IOException {
+
+		LOGGER.info( "{" + UUID + "} -> Criando arquivos opcionais: " + beaconForm );
 
 		for ( CommonsMultipartFile file : beaconForm.getArqopt() ) {
 
-			File arquivo = new File( pathFolder + "/"
-					+ file.getOriginalFilename() );
+			File arquivo = new File( pathFolder + "/" + file.getOriginalFilename() );
 			arquivo.createNewFile();
 
 			file.transferTo( arquivo );
@@ -165,12 +138,12 @@ public class PrologService {
 		}
 	}
 
-	private void generateFoldPos( final BeaconForm beaconForm,
-			final CommonsMultipartFile file, final String pathFolder,
-			final int index ) throws IOException {
+	private void generateFoldPos( final BeaconForm beaconForm, final CommonsMultipartFile file, final String pathFolder, final int index,
+									final String UUID ) throws IOException {
 
-		File arquivo = new File( pathFolder + "/"
-				+ beaconForm.getArqpos()[index].getName() + index + ".f" );
+		LOGGER.info( "{" + UUID + "} -> Criando folds positivos: " + beaconForm );
+
+		File arquivo = new File( pathFolder + "/" + beaconForm.getArqpos()[index].getName() + index + ".f" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -184,10 +157,9 @@ public class PrologService {
 
 				if ( index != j ) {
 
-					InputStream input = beaconForm.getArqpos()[j]
-							.getInputStream();
+					InputStream input = beaconForm.getArqpos()[j].getInputStream();
 
-					conteudo += getStringFromInputStream( input );
+					conteudo += getStringFromInputStream( input, UUID );
 
 					input.close();
 				}
@@ -199,12 +171,12 @@ public class PrologService {
 		fw.close();
 	}
 
-	private void generateFoldNeg( final BeaconForm beaconForm,
-			final CommonsMultipartFile file, final String pathFolder,
-			final int index ) throws IOException {
+	private void generateFoldNeg( final BeaconForm beaconForm, final CommonsMultipartFile file, final String pathFolder, final int index,
+									final String UUID ) throws IOException {
 
-		File arquivo = new File( pathFolder + "/"
-				+ beaconForm.getArqneg()[index].getName() + index + ".n" );
+		LOGGER.info( "{" + UUID + "} -> Criando folds negativos: " + beaconForm );
+
+		File arquivo = new File( pathFolder + "/" + beaconForm.getArqneg()[index].getName() + index + ".n" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -218,10 +190,9 @@ public class PrologService {
 
 				if ( index != j ) {
 
-					InputStream input = beaconForm.getArqneg()[j]
-							.getInputStream();
+					InputStream input = beaconForm.getArqneg()[j].getInputStream();
 
-					conteudo += getStringFromInputStream( input );
+					conteudo += getStringFromInputStream( input, UUID );
 
 					input.close();
 				}
@@ -234,7 +205,7 @@ public class PrologService {
 		fw.close();
 	}
 
-	public static String getStringFromInputStream( final InputStream is ) {
+	public static String getStringFromInputStream( final InputStream is, final String UUID ) {
 
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
@@ -248,7 +219,9 @@ public class PrologService {
 			}
 
 		} catch ( IOException e ) {
-			e.printStackTrace();
+
+			LOGGER.error( "{" + UUID + "} -> erro lendo arquivo." );
+
 		} finally {
 			if ( br != null ) {
 				try {
