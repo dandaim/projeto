@@ -26,6 +26,9 @@ public class PrologService {
 
 	public static Runnable r = ThreadHelper.getInstance();
 
+	private final static String regularExpressionUrl = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
+	private final static String regularExpressionSpace = "%20";
+
 	public void executeShellScript( final BeaconForm beaconForm, String UUID ) throws Exception {
 
 		String pathFolder = StorageHelper.commonPath + Md5Helper.md5( beaconForm.getEmail() );
@@ -215,6 +218,7 @@ public class PrologService {
 
 			br = new BufferedReader( new InputStreamReader( is ) );
 			while ( ( line = br.readLine() ) != null ) {
+
 				sb.append( line + "\n" );
 			}
 

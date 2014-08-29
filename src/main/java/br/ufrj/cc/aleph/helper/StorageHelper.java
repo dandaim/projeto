@@ -108,6 +108,7 @@ public class StorageHelper {
 			out.println( " \"" );
 			out.println( " prolog <<< $string" );
 			out.close();
+			outFile.close();
 
 			LOGGER.info( "{" + UUID + "} -> Executando o script: gerador de resultado do rdf" );
 
@@ -118,6 +119,24 @@ public class StorageHelper {
 			synchronized ( p ) {
 
 				p.waitFor();
+				//
+				//				BufferedReader br = new BufferedReader( new FileReader( folder + "/result.out" ) );
+				//
+				//				String sCurrentLine;
+				//
+				//				String regularExpression = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
+				//
+				//				FileWriter result = new FileWriter( folder + "/result.out" );
+				//				PrintWriter outResult = new PrintWriter( result );
+				//
+				//				while ( ( sCurrentLine = br.readLine() ) != null ) {
+				//
+				//					outResult.println( sCurrentLine.replaceAll( regularExpression, "" ) );
+				//				}
+				//
+				//				br.close();
+				//				outResult.close();
+				//				result.close();
 			}
 
 		} catch ( IOException e ) {
@@ -129,10 +148,12 @@ public class StorageHelper {
 
 			LOGGER.error( "{" + UUID + "} -> Erro de execução da thread do script rdf: " + e.getMessage() );
 			throw new Exception( e );
+		} catch ( Exception e ) {
+			LOGGER.error( "{" + UUID + "} -> Erro de execução da thread do script rdf: " + e.getMessage() );
+			throw new Exception( e );
 		}
 
 		return folder + "/script.sh";
 
 	}
-
 }
