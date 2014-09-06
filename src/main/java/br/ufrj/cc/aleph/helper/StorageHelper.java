@@ -1,10 +1,21 @@
 package br.ufrj.cc.aleph.helper;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +24,8 @@ public class StorageHelper {
 
 	private static final Logger LOGGER = Logger.getLogger( StorageHelper.class );
 
-	// public static String commonPath = "/home/ec2-user/pacote/";
 	public static String commonPath;
 
-	// public static String alephPath = "/home/ec2-user/uw_aleph/";
 	public static String alephPath;
 
 	@PostConstruct
@@ -32,7 +41,8 @@ public class StorageHelper {
 		return String.valueOf( Calendar.getInstance().getTimeInMillis() );
 	}
 
-	public static String generateTemplate( final String userName, final String userEmail, final int numFiles, final String folder ) {
+	public static String generateTemplate( final String userName,
+			final String userEmail, final int numFiles, final String folder ) {
 
 		try {
 
@@ -46,7 +56,8 @@ public class StorageHelper {
 			// Adicionando leitura de todos os arquivos na execução do script
 			for ( int i = 0; i < numFiles; i++ ) {
 
-				out.print( " read_all(arqb" + i + ", arqpos" + i + ", arqneg" + i + ")." );
+				out.print( " read_all(arqb" + i + ", arqpos" + i + ", arqneg"
+						+ i + ")." );
 				out.print( " induce." );
 			}
 
@@ -57,7 +68,8 @@ public class StorageHelper {
 
 		} catch ( IOException e ) {
 
-			System.out.println( "Erro na classe StorageHelper no método generateTemplate" );
+			System.out
+					.println( "Erro na classe StorageHelper no método generateTemplate" );
 
 			System.out.println( "Erro: " + e.getMessage() );
 			e.printStackTrace();
@@ -68,16 +80,19 @@ public class StorageHelper {
 
 	}
 
-	public static String generateFileRdf( final String folder, final String UUID ) throws Exception {
+	public static String generateFileRdf( final String folder, final String UUID )
+			throws Exception {
 
 		try {
 
-			LOGGER.info( "{" + UUID + "} -> Gerando o arquivo RDF na pasta: " + folder );
+			LOGGER.info( "{" + UUID + "} -> Gerando o arquivo RDF na pasta: "
+					+ folder );
 
 			FileWriter prolog = new FileWriter( folder + "/prolog.pl" );
 			PrintWriter outProlog = new PrintWriter( prolog );
 
-			outProlog.println( "ini:- open('" + folder + "/result.out',write,_,[alias(escrita)])," );
+			outProlog.println( "ini:- open('" + folder
+					+ "/result.out',write,_,[alias(escrita)])," );
 			outProlog.println( "[library(rdf)]," );
 			outProlog.println( "load_rdf('" + folder + "/file.rdf', [H|T])," );
 			outProlog.println( "checklist(assert, [H|T])," );
@@ -88,7 +103,7 @@ public class StorageHelper {
 			outProlog.println( "escreve(X,Y,Z)," );
 			outProlog.println( "fail." );
 			outProlog.println( "escreve(X,Y,Z):-" );
-			outProlog.println( "write(escrita,':- ')," );
+			outProlog.println( "write(escrita,'')," );
 			outProlog.println( "write(escrita,Y)," );
 			outProlog.println( "write(escrita,'(')," );
 			outProlog.println( "write(escrita,X)," );
@@ -110,50 +125,126 @@ public class StorageHelper {
 			out.close();
 			outFile.close();
 
-			LOGGER.info( "{" + UUID + "} -> Executando o script: gerador de resultado do rdf" );
+			LOGGER.info( "{" + UUID
+					+ "} -> Executando o script: gerador de resultado do rdf" );
 
-			ProcessBuilder pb = new ProcessBuilder( "/bin/bash", folder + "/script.sh" );
+			ProcessBuilder pb = new ProcessBuilder( "/bin/bash", folder
+					+ "/script.sh" );
 
 			Process p = pb.start();
 
 			synchronized ( p ) {
 
 				p.waitFor();
-				//
-				//				BufferedReader br = new BufferedReader( new FileReader( folder + "/result.out" ) );
-				//
-				//				String sCurrentLine;
-				//
-				//				String regularExpression = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
-				//
-				//				FileWriter result = new FileWriter( folder + "/result.out" );
-				//				PrintWriter outResult = new PrintWriter( result );
-				//
-				//				while ( ( sCurrentLine = br.readLine() ) != null ) {
-				//
-				//					outResult.println( sCurrentLine.replaceAll( regularExpression, "" ) );
-				//				}
-				//
-				//				br.close();
-				//				outResult.close();
-				//				result.close();
+
 			}
+
+			BufferedReader br = new BufferedReader( new FileReader( folder
+					+ "/result.out" ) );
+
+			String sCurrentLine;
+
+			String regularExpression = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
+
+			String regularExpressionNumber = "[0-9-\\.]+_[a-zA-Z]+";
+
+			String regularExpressionStringNumber = "[a-zA-Z_]+[0-9-\\.]+";
+
+			FileWriter result = new FileWriter( folder + "/result-fixed.out" );
+			PrintWriter outResult = new PrintWriter( result );
+
+			Map<String, List<String>> mapLines = new HashMap<String, List<String>>();
+
+			while ( ( sCurrentLine = br.readLine() ) != null ) {
+
+				sCurrentLine = sCurrentLine.toLowerCase();
+
+				sCurrentLine = sCurrentLine.replaceAll( regularExpression, "" );
+
+				sCurrentLine = sCurrentLine.replaceAll( "%20", "_" );
+
+				sCurrentLine = sCurrentLine.replaceAll( " ", "_" );
+
+				Pattern pattern = Pattern.compile( regularExpressionNumber );
+
+				Matcher m = pattern.matcher( sCurrentLine );
+
+				while ( m.find() ) {
+
+					String newValue = m.group( 0 )
+							.replaceAll( "_[a-zA-Z]+", "" );
+					sCurrentLine = sCurrentLine
+							.replace( m.group( 0 ), newValue );
+				}
+
+				pattern = Pattern.compile( regularExpressionStringNumber );
+
+				m = pattern.matcher( sCurrentLine );
+
+				while ( m.find() ) {
+
+					String newValue = m.group( 0 )
+							.replaceAll( "_[0-9\\.]+", "" );
+					sCurrentLine = sCurrentLine
+							.replace( m.group( 0 ), newValue );
+				}
+
+				String[] values = sCurrentLine.split( "\\(" );
+
+				if ( mapLines.containsKey( values[0] ) ) {
+
+					mapLines.get( values[0] ).add( sCurrentLine );
+				} else {
+
+					List<String> newList = new ArrayList<String>();
+					newList.add( sCurrentLine );
+					mapLines.put( values[0], newList );
+				}
+
+			}
+
+			for ( Entry<String, List<String>> entry : mapLines.entrySet() ) {
+
+				for ( String line : entry.getValue() ) {
+
+					outResult.println( line );
+				}
+			}
+
+			br.close();
+			outResult.close();
+			result.close();
 
 		} catch ( IOException e ) {
 
-			LOGGER.error( "{" + UUID + "} -> Erro de input ao gerar arquivo rdf: " + e.getMessage() );
+			LOGGER.error( "{" + UUID
+					+ "} -> Erro de input ao gerar arquivo rdf: "
+					+ e.getMessage() );
 			throw new Exception( e );
 
 		} catch ( InterruptedException e ) {
 
-			LOGGER.error( "{" + UUID + "} -> Erro de execução da thread do script rdf: " + e.getMessage() );
+			LOGGER.error( "{" + UUID
+					+ "} -> Erro de execução da thread do script rdf: "
+					+ e.getMessage() );
 			throw new Exception( e );
 		} catch ( Exception e ) {
-			LOGGER.error( "{" + UUID + "} -> Erro de execução da thread do script rdf: " + e.getMessage() );
+			LOGGER.error( "{" + UUID
+					+ "} -> Erro de execução da thread do script rdf: "
+					+ e.getMessage() );
 			throw new Exception( e );
 		}
 
 		return folder + "/script.sh";
+	}
+
+	public static void main( String[] args ) {
+
+		String value = "megabytes(example6_instance_17,literal(1024)).";
+
+		String[] values = value.split( "\\(" );
+
+		System.out.println( values[0] );
 
 	}
 }
