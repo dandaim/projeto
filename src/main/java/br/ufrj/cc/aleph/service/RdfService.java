@@ -8,8 +8,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+
 import br.ufrj.cc.aleph.controller.form.TripletsForm;
 import br.ufrj.cc.aleph.helper.Md5Helper;
 import br.ufrj.cc.aleph.helper.StorageHelper;
@@ -19,11 +21,15 @@ public class RdfService {
 
 	private static final Logger LOGGER = Logger.getLogger( RdfService.class );
 
-	public void generateRdfFile( TripletsForm tripletsForm, final String UUID ) throws Exception {
+	public void generateRdfFile( TripletsForm tripletsForm, final String UUID )
+			throws Exception {
 
-		String pathFolder = StorageHelper.commonPath + Md5Helper.md5( tripletsForm.getEmail() );
+		String pathFolder = StorageHelper.commonPath
+				+ Md5Helper.md5( tripletsForm.getEmail() );
 
-		String nextFolder = "/" + StorageHelper.getNextPath( Md5Helper.md5( tripletsForm.getEmail() ) );
+		String nextFolder = "/"
+				+ StorageHelper.getNextPath( Md5Helper.md5( tripletsForm
+						.getEmail() ) );
 
 		pathFolder += nextFolder;
 
@@ -34,20 +40,23 @@ public class RdfService {
 
 		if ( tripletsForm.getOption().equals( "url" ) ) {
 
-			LOGGER.info( "{" + UUID + "} -> Usuário optou por gerar rdf a partir da url: " + tripletsForm.getUrl() );
+			LOGGER.info( "{" + UUID
+					+ "} -> Usuário optou por gerar rdf a partir da url: "
+					+ tripletsForm.getUrl() );
 
 			generateRdfFromUrl( tripletsForm, pathFolder, UUID );
 
-		}
-		else {
+		} else {
 
-			LOGGER.info( "{" + UUID + "} -> Usuário optou por gerar rdf a partir do arquivo" );
+			LOGGER.info( "{" + UUID
+					+ "} -> Usuário optou por gerar rdf a partir do arquivo" );
 
 			generateRdfFromFile( tripletsForm, pathFolder, UUID );
 		}
 	}
 
-	public void generateRdfFromUrl( TripletsForm tripletsForm, String pathFolder, final String UUID ) throws Exception {
+	public void generateRdfFromUrl( TripletsForm tripletsForm,
+			String pathFolder, final String UUID ) throws Exception {
 
 		try {
 
@@ -58,11 +67,12 @@ public class RdfService {
 			URLConnection connection = website.openConnection();
 			InputStream file = connection.getInputStream();
 
-			saveRdf( pathFolder, file, UUID );
+			saveRdf( pathFolder, file, UUID, tripletsForm.getTarget() );
 
 		} catch ( MalformedURLException e ) {
 
-			LOGGER.error( "{" + UUID + "} -> URL mal escrita: " + e.getMessage() );
+			LOGGER.error( "{" + UUID + "} -> URL mal escrita: "
+					+ e.getMessage() );
 			throw new Exception( e );
 
 		} catch ( IOException e ) {
@@ -73,7 +83,8 @@ public class RdfService {
 
 	}
 
-	private void saveRdf( String pathFolder, InputStream file, final String UUID ) throws Exception {
+	private void saveRdf( String pathFolder, InputStream file,
+			final String UUID, final String target ) throws Exception {
 
 		LOGGER.info( "{" + UUID + "} -> Salvando arquivo rdf. " );
 
@@ -89,16 +100,17 @@ public class RdfService {
 		file.close();
 		bw.close();
 
-		StorageHelper.generateFileRdf( pathFolder, UUID );
+		StorageHelper.generateFileRdf( pathFolder, UUID, target );
 	}
 
-	public void generateRdfFromFile( TripletsForm tripletsForm, String pathFolder, final String UUID ) throws Exception {
+	public void generateRdfFromFile( TripletsForm tripletsForm,
+			String pathFolder, final String UUID ) throws Exception {
 
 		try {
 
 			InputStream file = tripletsForm.getFile().getInputStream();
 
-			saveRdf( pathFolder, file, UUID );
+			saveRdf( pathFolder, file, UUID, tripletsForm.getTarget() );
 
 		} catch ( IOException e ) {
 

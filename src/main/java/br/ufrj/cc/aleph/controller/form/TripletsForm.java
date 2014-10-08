@@ -9,16 +9,18 @@ public class TripletsForm {
 	private String email;
 	private String name;
 	private CommonsMultipartFile file;
-
-	@Override
-	public String toString() {
-
-		return "TripletsForm [option=" + option + ", url=" + url + ", email=" + email + ", name=" + name + "]";
-	}
+	private String target;
 
 	public String getUrl() {
 
 		return url;
+	}
+
+	@Override
+	public String toString() {
+		return "TripletsForm [option=" + option + ", url=" + url + ", email="
+				+ email + ", name=" + name + ", file=" + file + ", target="
+				+ target + "]";
 	}
 
 	public void setUrl( String url ) {
@@ -64,6 +66,14 @@ public class TripletsForm {
 	public void setName( String name ) {
 
 		this.name = name;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget( String target ) {
+		this.target = target;
 	}
 
 }

@@ -1,7 +1,11 @@
 package br.ufrj.cc.aleph.controller;
 
 import java.util.UUID;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.validation.Valid;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,8 +16,10 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import br.ufrj.cc.aleph.controller.form.TripletsForm;
 import br.ufrj.cc.aleph.controller.validator.TripletsValidator;
+import br.ufrj.cc.aleph.service.MailService;
 import br.ufrj.cc.aleph.service.RdfService;
 
 @Controller
@@ -24,6 +30,9 @@ public class RdfController {
 
 	@Autowired
 	private RdfService rdfService;
+
+	@Autowired
+	private MailService mailService;
 
 	@InitBinder( value = "tripletsForm" )
 	protected void initBinder( final WebDataBinder binder ) {
@@ -46,12 +55,17 @@ public class RdfController {
 	}
 
 	@RequestMapping( value = "/request", method = RequestMethod.POST )
-	public String callService( @ModelAttribute( "tripletsForm" ) @Valid TripletsForm tripletsForm, final BindingResult result,
-								final Model model ) {
+	public String callService(
+			@ModelAttribute( "tripletsForm" ) @Valid TripletsForm tripletsForm,
+			final BindingResult result, final Model model )
+			throws AddressException, MessagingException {
 
 		String view = "/rdf";
 
 		if ( result.hasErrors() ) {
+
+			mailService.processMail( "dandaim@gmail.com", "Teste", "Uhul!",
+					"ufrj.cc.aleph@gmail.com" );
 
 			return view;
 		}
@@ -64,7 +78,9 @@ public class RdfController {
 
 		} catch ( Exception e ) {
 
-			LOGGER.error( "{" + flowId + "} -> Erro no fluxo de geração do arquivo RDF. " + e.getMessage() );
+			LOGGER.error( "{" + flowId
+					+ "} -> Erro no fluxo de geração do arquivo RDF. "
+					+ e.getMessage() );
 		}
 
 		return view;

@@ -77,6 +77,13 @@
 									<form:errors path="file" cssClass="error" />
 								</div>							
 							</div>
+							<div class="form-group" >
+								<label for="url" class="col-sm-1 control-label">Target</label>
+								<div class="col-sm-5">
+									<form:input id="target" class="form-control" placeholder="Enter target (optional)" name="target" path="target" />
+									<form:errors path="target" cssClass="error" />
+								</div>							
+							</div>	
 							<div class="form-group">
 								<div class="col-sm-8 col-sm-offset-1">
 									<input type="submit" class="btn btn-danger" value="Send Data" />

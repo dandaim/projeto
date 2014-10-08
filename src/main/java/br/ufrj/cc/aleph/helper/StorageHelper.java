@@ -63,7 +63,6 @@ public class StorageHelper {
 
 			out.println( " halt.\"" );
 			out.println( " yap <<< $string > result.out" );
-			// out.println(" exit 0" );
 			out.close();
 
 		} catch ( IOException e ) {
@@ -80,8 +79,8 @@ public class StorageHelper {
 
 	}
 
-	public static String generateFileRdf( final String folder, final String UUID )
-			throws Exception {
+	public static String generateFileRdf( final String folder,
+			final String UUID, final String target ) throws Exception {
 
 		try {
 
@@ -146,6 +145,8 @@ public class StorageHelper {
 
 			String regularExpression = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
 
+			String regularExpressionUrl = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br|de)[a-zA-Z0-9-\\./-]*";
+
 			String regularExpressionNumber = "[0-9-\\.]+_[a-zA-Z]+";
 
 			String regularExpressionStringNumber = "[a-zA-Z_]+[0-9-\\.]+";
@@ -189,6 +190,26 @@ public class StorageHelper {
 							.replace( m.group( 0 ), newValue );
 				}
 
+				pattern = Pattern.compile( regularExpressionUrl );
+
+				m = pattern.matcher( sCurrentLine );
+
+				while ( m.find() ) {
+
+					String[] values = m.group( 0 ).split( "/" );
+
+					sCurrentLine = sCurrentLine.replaceAll( m.group( 0 ),
+							values[values.length - 1] );
+				}
+
+				sCurrentLine = sCurrentLine.replaceAll( "\\:", "" );
+
+				sCurrentLine = sCurrentLine.replaceAll( "\\.", "" );
+
+				sCurrentLine = sCurrentLine.replaceAll( "\\#", "_" );
+
+				sCurrentLine += ".";
+
 				String[] values = sCurrentLine.split( "\\(" );
 
 				if ( mapLines.containsKey( values[0] ) ) {
@@ -215,6 +236,21 @@ public class StorageHelper {
 			outResult.close();
 			result.close();
 
+			if ( !target.isEmpty() && mapLines.containsKey( target ) ) {
+
+				FileWriter targetResult = new FileWriter( folder
+						+ "/result-target.out" );
+				PrintWriter targetOutResult = new PrintWriter( targetResult );
+
+				for ( String line : mapLines.get( target ) ) {
+
+					targetOutResult.println( line );
+				}
+
+				targetResult.close();
+				targetOutResult.close();
+			}
+
 		} catch ( IOException e ) {
 
 			LOGGER.error( "{" + UUID
@@ -240,11 +276,13 @@ public class StorageHelper {
 
 	public static void main( String[] args ) {
 
-		String value = "megabytes(example6_instance_17,literal(1024)).";
+		String regularExpressionUrl = "\\.";
 
-		String[] values = value.split( "\\(" );
+		String value = "comment(topic,literal(type(string,rule:_every_requirement_refers_to_exact_one_topic.))).";
 
-		System.out.println( values[0] );
+		value = value.replaceAll( "\\:", "" );
+
+		System.out.println( value + "." );
 
 	}
 }
