@@ -9,8 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -27,6 +26,9 @@ public class PrologService {
 	private static final Logger LOGGER = Logger.getLogger( PrologService.class );
 
 	public static Runnable r = ThreadHelper.getInstance();
+
+	@Autowired
+	private MailHelper mailHelper;
 
 	public void executeShellScript( final BeaconForm beaconForm, String UUID )
 			throws Exception {
@@ -95,12 +97,8 @@ public class PrologService {
 		LOGGER.info( "{" + UUID + "} -> Enviando email para o usuário: "
 				+ beaconForm.getEmail() );
 
-		ApplicationContext context = new ClassPathXmlApplicationContext(
-				"classpath:spring/mail.xml" );
-
-		MailHelper mailHelper = ( MailHelper ) context.getBean( "mailHelper" );
-
-		mailHelper.sendEmail( beaconForm.getEmail(), "teste",
+		mailHelper.sendEmail( beaconForm.getEmail(),
+				"DAHELE - Envio de requisição",
 				MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
 
 		LOGGER.info( "{" + UUID + "} -> Iniciando a thread da requisição." );

@@ -1,5 +1,6 @@
 package br.ufrj.cc.aleph.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -31,11 +32,17 @@ public class ThreadHelper implements Runnable {
 
 	public void run() {
 
+		String userName = null;
+		String userEmail = null;
+
 		try {
 
 			semaforo.acquire();
 
 			UserRequest userRequest = userRequestQueue.poll();
+
+			userName = userRequest.getName();
+			userEmail = userRequest.getEmail();
 
 			ApplicationContext context = new ClassPathXmlApplicationContext(
 					"classpath:spring/mail.xml" );
@@ -43,7 +50,8 @@ public class ThreadHelper implements Runnable {
 			MailHelper mailHelper = ( MailHelper ) context
 					.getBean( "mailHelper" );
 
-			mailHelper.sendEmail( userRequest.getEmail(), "teste",
+			mailHelper.sendEmail( userRequest.getEmail(),
+					"DAHELE - Início do processamento",
 					MailContentEnum.INIT.getMsg(), userRequest.getName() );
 
 			String templatePath = "";
@@ -70,8 +78,13 @@ public class ThreadHelper implements Runnable {
 
 			semaforo.release();
 
-			mailHelper.sendEmail( userRequest.getEmail(), "teste",
-					MailContentEnum.END.getMsg(), userRequest.getName() );
+			File resultOut = new File( userRequest.getFolder() + "/result.out" );
+			File resultRs = new File( userRequest.getFolder() + "/Rs" );
+
+			mailHelper.sendEmail( userRequest.getEmail(),
+					"DAHELE - Resultados da Requisição",
+					MailContentEnum.END.getMsg(), userRequest.getName(),
+					resultOut, resultRs );
 
 		} catch ( IOException e ) {
 
@@ -88,6 +101,15 @@ public class ThreadHelper implements Runnable {
 			System.out.println( "Erro na classe ThreadHelper" );
 			System.out.println( "Erro: " + e.getMessage() );
 			e.printStackTrace();
+
+			ApplicationContext context = new ClassPathXmlApplicationContext(
+					"classpath:spring/mail.xml" );
+
+			MailHelper mailHelper = ( MailHelper ) context
+					.getBean( "mailHelper" );
+
+			mailHelper.sendEmail( userEmail, "DAHELE - Erro na requisição",
+					MailContentEnum.ERROR.getMsg(), userName );
 		}
 	}
 }

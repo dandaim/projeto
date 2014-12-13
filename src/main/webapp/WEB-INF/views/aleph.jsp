@@ -10,7 +10,7 @@
 
 <html>
 	<head>
-		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Home - DAHELE - UFRJ</title>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script>
@@ -33,6 +33,9 @@
 					<h3>Enter data for processing</h3>
 				</div>
 				<div class="row">
+					<c:if test="${not empty msg}">
+						<div class="alert alert-${msgType}" role="alert">${msg}</div>	
+					</c:if>	
 					<form:form method="post" action="${context}/home/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
 						<div class="form-group" >
 							<label for="email" class="col-sm-2 control-label">Email</label>

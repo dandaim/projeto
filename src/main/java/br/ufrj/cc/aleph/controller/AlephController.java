@@ -1,7 +1,9 @@
 package br.ufrj.cc.aleph.controller;
 
 import java.util.UUID;
+
 import javax.validation.Valid;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import br.ufrj.cc.aleph.controller.form.BeaconForm;
 import br.ufrj.cc.aleph.controller.validator.BeaconValidator;
 import br.ufrj.cc.aleph.service.PrologService;
@@ -46,7 +49,9 @@ public class AlephController {
 	}
 
 	@RequestMapping( value = "/request", method = RequestMethod.POST )
-	public String callService( @ModelAttribute( "beaconForm" ) @Valid BeaconForm beaconForm, final BindingResult result, final Model model ) {
+	public String callService(
+			@ModelAttribute( "beaconForm" ) @Valid BeaconForm beaconForm,
+			final BindingResult result, final Model model ) {
 
 		String view = "/aleph";
 
@@ -61,9 +66,20 @@ public class AlephController {
 
 			prologService.executeShellScript( beaconForm, flowId );
 
+			model.addAttribute(
+					"msg",
+					"Request has been sent successfully. Wait for response processing. It will be send soon." );
+			model.addAttribute( "msgType", "success" );
+
 		} catch ( Exception e ) {
 
-			LOGGER.error( "{" + flowId + "} -> Erro na requisição: " + e.getMessage() );
+			LOGGER.error( "{" + flowId + "} -> Erro na requisição: "
+					+ e.getMessage() );
+
+			model.addAttribute(
+					"msg",
+					"Error sending request. Contact administrators for this issue (ufrj.cc.aleph@gmail.com)." );
+			model.addAttribute( "msgType", "danger" );
 		}
 
 		return view;

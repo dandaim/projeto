@@ -17,8 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.ufrj.cc.aleph.controller.form.TripletsForm;
@@ -34,6 +33,9 @@ public class RdfService {
 	private static final Logger LOGGER = Logger.getLogger( RdfService.class );
 
 	public static Runnable r = ThreadHelper.getInstance();
+
+	@Autowired
+	private MailHelper mailHelper;
 
 	public void generateRdfFile( TripletsForm tripletsForm, final String UUID )
 			throws Exception {
@@ -80,12 +82,8 @@ public class RdfService {
 		LOGGER.info( "{" + UUID + "} -> Enviando email para o usuário: "
 				+ tripletsForm.getEmail() );
 
-		ApplicationContext context = new ClassPathXmlApplicationContext(
-				"classpath:spring/mail.xml" );
-
-		MailHelper mailHelper = ( MailHelper ) context.getBean( "mailHelper" );
-
-		mailHelper.sendEmail( tripletsForm.getEmail(), "teste",
+		mailHelper.sendEmail( tripletsForm.getEmail(),
+				"DAHELE - Envio de requisição",
 				MailContentEnum.REQUEST.getMsg(), tripletsForm.getName() );
 
 		LOGGER.info( "{" + UUID + "} -> Iniciando a thread da requisição." );

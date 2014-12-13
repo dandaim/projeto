@@ -10,7 +10,7 @@
 
 <html>
 	<head>
-		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Home - DAHELE - UFRJ</title>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script>
@@ -30,8 +30,12 @@
 				<div class="page-header">
 					<h3>Choose a rdf source</h3>
 				</div>
+							
 				<div class="row">
 					<div class="col-sm-12">
+						<c:if test="${not empty msg}">
+							<div class="alert alert-${msgType}" role="alert">${msg}</div>	
+						</c:if>	
 						<form:form method="post" action="${context}/rdf/request" class="form-horizontal" modelAttribute="tripletsForm" enctype="multipart/form-data" >
 							<div class="form-group " >
 								<label for="email" class="col-sm-1 control-label">Email</label>

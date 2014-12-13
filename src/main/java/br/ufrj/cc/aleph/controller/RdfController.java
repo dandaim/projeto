@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import br.ufrj.cc.aleph.controller.form.TripletsForm;
 import br.ufrj.cc.aleph.controller.validator.TripletsValidator;
-import br.ufrj.cc.aleph.service.MailService;
+import br.ufrj.cc.aleph.helper.MailHelper;
 import br.ufrj.cc.aleph.service.RdfService;
 
 @Controller
@@ -32,7 +32,7 @@ public class RdfController {
 	private RdfService rdfService;
 
 	@Autowired
-	private MailService mailService;
+	private MailHelper mailHelper;
 
 	@InitBinder( value = "tripletsForm" )
 	protected void initBinder( final WebDataBinder binder ) {
@@ -64,9 +64,6 @@ public class RdfController {
 
 		if ( result.hasErrors() ) {
 
-			mailService.processMail( "dandaim@gmail.com", "Teste", "Uhul!",
-					"ufrj.cc.aleph@gmail.com" );
-
 			return view;
 		}
 
@@ -76,11 +73,21 @@ public class RdfController {
 
 			rdfService.generateRdfFile( tripletsForm, flowId );
 
+			model.addAttribute(
+					"msg",
+					"Request has been sent successfully. Wait for response processing. It will be send soon." );
+			model.addAttribute( "msgType", "success" );
+
 		} catch ( Exception e ) {
 
 			LOGGER.error( "{" + flowId
 					+ "} -> Erro no fluxo de geração do arquivo RDF. "
 					+ e.getMessage() );
+
+			model.addAttribute(
+					"msg",
+					"Error sending request. Contact administrators for this issue (ufrj.cc.aleph@gmail.com)." );
+			model.addAttribute( "msgType", "danger" );
 		}
 
 		return view;

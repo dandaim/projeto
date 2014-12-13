@@ -1,31 +1,54 @@
 package br.ufrj.cc.aleph.helper;
 
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import java.io.File;
 
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+@Component
 public class MailHelper {
 
 	public static String EMAIL_FROM = "ufrj.cc.aleph@gmail.com";
 
-	private MailSender mailSender;
+	private JavaMailSender mailSender;
 
-	public void setMailSender( final MailSender mailSender ) {
+	public void setMailSender( final JavaMailSender mailSender ) {
 
 		this.mailSender = mailSender;
 	}
 
 	public void sendEmail( final String to, final String subject,
-			final String msg, final String userName ) {
+			final String msg, final String userName, File... attachs ) {
 
-		SimpleMailMessage message = new SimpleMailMessage();
+		try {
 
-		message.setFrom( EMAIL_FROM );
-		message.setTo( to );
-		message.setSubject( subject );
-		message.setText( String.format( msg, userName ) );
+			MimeMessage message = mailSender.createMimeMessage();
 
-		mailSender.send( message );
+			MimeMessageHelper helper = new MimeMessageHelper( message, true,
+					"UTF-8" );
+
+			helper.setFrom( EMAIL_FROM );
+			helper.setTo( to );
+			helper.setSubject( subject );
+			helper.setText( String.format( msg, userName ) );
+
+			if ( attachs != null && attachs.length > 0 ) {
+
+				for ( File file : attachs ) {
+
+					helper.addAttachment( file.getName(), file );
+				}
+			}
+
+			mailSender.send( message );
+
+		} catch ( Exception e ) {
+
+			e.printStackTrace();
+		}
 
 	}
-
 }

@@ -23,8 +23,8 @@ public class MailService {
 
 		// final String smtpHost = this.emailConfig.getSmtp();
 		final String smtpHost = "email-smtp.us-west-2.amazonaws.com";
-		final String emailAccount = "AKIAJXQNDS4E74MYOSRA";
-		final String emailPassword = "AqpFZN+9dSjQsuRJZQ76IYcuOeXgvnBl6ebIK0GoC9i7";
+		final String emailAccount = "AKIAIAKA33BN5DAWFAQA";
+		final String emailPassword = "AoHlUFSMs5cIXnN+USRf80PUbruOlW3KnhzutCtuEIIm";
 		final String smtpPort = "587";
 		// final String smtpPort = this.emailConfig.getPort();
 
