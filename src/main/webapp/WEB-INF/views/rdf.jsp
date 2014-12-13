@@ -16,7 +16,7 @@
 		<script>
 			
 			$(document).ready(function(){				
-				$(".file").hide();				
+				$(".url").hide();				
 			});		
 		</script>
 		<link href="<c:url value="/resources/css/bootstrap.min.css" />" rel="stylesheet" media="screen">
@@ -51,13 +51,13 @@
 							    <div class="col-sm-offset-1 col-sm-10">
 							      	<div class="radio">
 									  <label>
-									    <form:radiobutton path="option" value="url" checked="checked"/>
+									    <form:radiobutton path="option" value="url"/>
 									    Use RDF from an url
 									  </label>								  
 									</div>
 									<div class="radio">
 									   <label>
-									    <form:radiobutton path="option" value="file" />
+									    <form:radiobutton path="option" value="file" checked="checked" />
 									    Use RDF from a file
 									  </label>							  
 									</div>
@@ -77,10 +77,18 @@
 									<form:errors path="file" cssClass="error" />
 								</div>							
 							</div>
+							<div class="form-group">
+								<label for="examples" class="col-sm-1 control-label">Examples file<span class="glyphicon glyphicon-info-sign" title="Load your examples here."></span></label>
+								<div class="col-sm-5">
+									<form:input id="examples" type="file" value="Choose Value" name="examples" path="examples" />
+									
+									<form:errors path="file" cssClass="error" />
+								</div>							
+							</div>
 							<div class="form-group" >
 								<label for="url" class="col-sm-1 control-label">Target</label>
 								<div class="col-sm-5">
-									<form:input id="target" class="form-control" placeholder="Enter target (optional)" name="target" path="target" />
+									<form:input id="target" class="form-control" placeholder="Enter target" name="target" path="target" />
 									<form:errors path="target" cssClass="error" />
 								</div>							
 							</div>	

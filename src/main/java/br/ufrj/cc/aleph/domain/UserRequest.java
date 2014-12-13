@@ -10,10 +10,13 @@ public class UserRequest {
 
 	private String folder;
 
+	private boolean aleph;
+
 	@Override
 	public String toString() {
 
-		return "UserRequest [email=" + email + ", name=" + name + ", numFiles=" + numFiles + ", folder=" + folder + "]";
+		return "UserRequest [email=" + email + ", name=" + name + ", numFiles="
+				+ numFiles + ", folder=" + folder + "]";
 	}
 
 	public String getEmail() {
@@ -36,12 +39,14 @@ public class UserRequest {
 		this.name = name;
 	}
 
-	public UserRequest( final String email, final String name, final int numFiles, final String folder ) {
+	public UserRequest( final String email, final String name,
+			final int numFiles, final String folder, final boolean aleph ) {
 
 		this.email = email;
 		this.name = name;
 		this.numFiles = numFiles;
 		this.folder = folder;
+		this.aleph = aleph;
 	}
 
 	public int getNumFiles() {
@@ -62,6 +67,14 @@ public class UserRequest {
 	public void setFolder( String folder ) {
 
 		this.folder = folder;
+	}
+
+	public boolean isAleph() {
+		return aleph;
+	}
+
+	public void setAleph( boolean aleph ) {
+		this.aleph = aleph;
 	}
 
 }

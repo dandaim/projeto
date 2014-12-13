@@ -9,6 +9,7 @@ public class TripletsForm {
 	private String email;
 	private String name;
 	private CommonsMultipartFile file;
+	private CommonsMultipartFile examples;
 	private String target;
 
 	public String getUrl() {
@@ -74,6 +75,14 @@ public class TripletsForm {
 
 	public void setTarget( String target ) {
 		this.target = target;
+	}
+
+	public CommonsMultipartFile getExamples() {
+		return examples;
+	}
+
+	public void setExamples( CommonsMultipartFile examples ) {
+		this.examples = examples;
 	}
 
 }

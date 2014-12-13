@@ -7,11 +7,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
 import br.ufrj.cc.aleph.controller.form.BeaconForm;
 import br.ufrj.cc.aleph.domain.UserRequest;
 import br.ufrj.cc.aleph.helper.MailContentEnum;
@@ -26,14 +28,15 @@ public class PrologService {
 
 	public static Runnable r = ThreadHelper.getInstance();
 
-	private final static String regularExpressionUrl = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
-	private final static String regularExpressionSpace = "%20";
+	public void executeShellScript( final BeaconForm beaconForm, String UUID )
+			throws Exception {
 
-	public void executeShellScript( final BeaconForm beaconForm, String UUID ) throws Exception {
+		String pathFolder = StorageHelper.commonPath
+				+ Md5Helper.md5( beaconForm.getEmail() );
 
-		String pathFolder = StorageHelper.commonPath + Md5Helper.md5( beaconForm.getEmail() );
-
-		String nextFolder = "/" + StorageHelper.getNextPath( Md5Helper.md5( beaconForm.getEmail() ) );
+		String nextFolder = "/"
+				+ StorageHelper.getNextPath( Md5Helper.md5( beaconForm
+						.getEmail() ) );
 
 		pathFolder += nextFolder;
 
@@ -45,7 +48,8 @@ public class PrologService {
 
 			LOGGER.info( "{" + UUID + "} -> Pasta a ser criada: " + pathFolder );
 
-			LOGGER.info( "{" + UUID + "} -> Vou criar a pasta caso não exista: " + pathFolder );
+			LOGGER.info( "{" + UUID
+					+ "} -> Vou criar a pasta caso não exista: " + pathFolder );
 
 			file.mkdirs();
 
@@ -57,10 +61,12 @@ public class PrologService {
 
 					generateFileB( beaconForm, pathFolder, i, UUID );
 
-					generateFoldPos( beaconForm, beaconForm.getArqpos()[i], pathFolder, i, UUID );
+					generateFoldPos( beaconForm, beaconForm.getArqpos()[i],
+							pathFolder, i, UUID );
 
 					if ( beaconForm.getArqneg() != null ) {
-						generateFoldNeg( beaconForm, beaconForm.getArqneg()[i], pathFolder, i, UUID );
+						generateFoldNeg( beaconForm, beaconForm.getArqneg()[i],
+								pathFolder, i, UUID );
 					}
 
 				}
@@ -71,7 +77,8 @@ public class PrologService {
 				generateArqOpt( beaconForm, pathFolder, UUID );
 			}
 
-			UserRequest userRequest = new UserRequest( beaconForm.getEmail(), beaconForm.getName(), files, pathFolder );
+			UserRequest userRequest = new UserRequest( beaconForm.getEmail(),
+					beaconForm.getName(), files, pathFolder, true );
 
 			LOGGER.info( "{" + UUID + "} -> Adicionando a requisição na fila: " );
 
@@ -79,18 +86,22 @@ public class PrologService {
 
 		} catch ( IOException e ) {
 
-			LOGGER.error( "{" + UUID + "} -> Erro gerando arquivos: " + e.getMessage() );
+			LOGGER.error( "{" + UUID + "} -> Erro gerando arquivos: "
+					+ e.getMessage() );
 			throw new Exception( e );
 
 		}
 
-		LOGGER.info( "{" + UUID + "} -> Enviando email para o usuário: " + beaconForm.getEmail() );
+		LOGGER.info( "{" + UUID + "} -> Enviando email para o usuário: "
+				+ beaconForm.getEmail() );
 
-		ApplicationContext context = new ClassPathXmlApplicationContext( "classpath:spring/mail.xml" );
+		ApplicationContext context = new ClassPathXmlApplicationContext(
+				"classpath:spring/mail.xml" );
 
-		MailHelper mailHelper = (MailHelper) context.getBean( "mailHelper" );
+		MailHelper mailHelper = ( MailHelper ) context.getBean( "mailHelper" );
 
-		mailHelper.sendEmail( beaconForm.getEmail(), "teste", MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
+		mailHelper.sendEmail( beaconForm.getEmail(), "teste",
+				MailContentEnum.REQUEST.getMsg(), beaconForm.getName() );
 
 		LOGGER.info( "{" + UUID + "} -> Iniciando a thread da requisição." );
 
@@ -102,11 +113,14 @@ public class PrologService {
 
 	}
 
-	private void generateFileB( final BeaconForm beaconForm, final String pathFolder, final int index, final String UUID ) throws IOException {
+	private void generateFileB( final BeaconForm beaconForm,
+			final String pathFolder, final int index, final String UUID )
+			throws IOException {
 
 		LOGGER.info( "{" + UUID + "} -> Criando arquivo B: " + beaconForm );
 
-		File arquivo = new File( pathFolder + "/" + beaconForm.getArqb().getName() + index + ".b" );
+		File arquivo = new File( pathFolder + "/"
+				+ beaconForm.getArqb().getName() + index + ".b" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -127,26 +141,33 @@ public class PrologService {
 		fw.close();
 	}
 
-	private void generateArqOpt( final BeaconForm beaconForm, final String pathFolder, final String UUID ) throws IOException {
+	private void generateArqOpt( final BeaconForm beaconForm,
+			final String pathFolder, final String UUID ) throws IOException {
 
-		LOGGER.info( "{" + UUID + "} -> Criando arquivos opcionais: " + beaconForm );
+		LOGGER.info( "{" + UUID + "} -> Criando arquivos opcionais: "
+				+ beaconForm );
 
 		for ( CommonsMultipartFile file : beaconForm.getArqopt() ) {
 
-			File arquivo = new File( pathFolder + "/" + file.getOriginalFilename() );
-			arquivo.createNewFile();
+			if ( file.getSize() > 0 ) {
+				File arquivo = new File( pathFolder + "/"
+						+ file.getOriginalFilename() );
+				arquivo.createNewFile();
 
-			file.transferTo( arquivo );
+				file.transferTo( arquivo );
+			}
 
 		}
 	}
 
-	private void generateFoldPos( final BeaconForm beaconForm, final CommonsMultipartFile file, final String pathFolder, final int index,
-									final String UUID ) throws IOException {
+	private void generateFoldPos( final BeaconForm beaconForm,
+			final CommonsMultipartFile file, final String pathFolder,
+			final int index, final String UUID ) throws IOException {
 
 		LOGGER.info( "{" + UUID + "} -> Criando folds positivos: " + beaconForm );
 
-		File arquivo = new File( pathFolder + "/" + beaconForm.getArqpos()[index].getName() + index + ".f" );
+		File arquivo = new File( pathFolder + "/"
+				+ beaconForm.getArqpos()[index].getName() + index + ".f" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -160,7 +181,8 @@ public class PrologService {
 
 				if ( index != j ) {
 
-					InputStream input = beaconForm.getArqpos()[j].getInputStream();
+					InputStream input = beaconForm.getArqpos()[j]
+							.getInputStream();
 
 					conteudo += getStringFromInputStream( input, UUID );
 
@@ -169,17 +191,28 @@ public class PrologService {
 			}
 		}
 
+		if ( conteudo.length() == 0 ) {
+
+			InputStream input = beaconForm.getArqpos()[index].getInputStream();
+
+			conteudo += getStringFromInputStream( input, UUID );
+
+			input.close();
+		}
+
 		bw.write( conteudo );
 		bw.close();
 		fw.close();
 	}
 
-	private void generateFoldNeg( final BeaconForm beaconForm, final CommonsMultipartFile file, final String pathFolder, final int index,
-									final String UUID ) throws IOException {
+	private void generateFoldNeg( final BeaconForm beaconForm,
+			final CommonsMultipartFile file, final String pathFolder,
+			final int index, final String UUID ) throws IOException {
 
 		LOGGER.info( "{" + UUID + "} -> Criando folds negativos: " + beaconForm );
 
-		File arquivo = new File( pathFolder + "/" + beaconForm.getArqneg()[index].getName() + index + ".n" );
+		File arquivo = new File( pathFolder + "/"
+				+ beaconForm.getArqneg()[index].getName() + index + ".n" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -193,7 +226,8 @@ public class PrologService {
 
 				if ( index != j ) {
 
-					InputStream input = beaconForm.getArqneg()[j].getInputStream();
+					InputStream input = beaconForm.getArqneg()[j]
+							.getInputStream();
 
 					conteudo += getStringFromInputStream( input, UUID );
 
@@ -203,12 +237,22 @@ public class PrologService {
 
 		}
 
+		if ( conteudo.length() == 0 ) {
+
+			InputStream input = beaconForm.getArqpos()[index].getInputStream();
+
+			conteudo += getStringFromInputStream( input, UUID );
+
+			input.close();
+		}
+
 		bw.write( conteudo );
 		bw.close();
 		fw.close();
 	}
 
-	public static String getStringFromInputStream( final InputStream is, final String UUID ) {
+	public static String getStringFromInputStream( final InputStream is,
+			final String UUID ) {
 
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();

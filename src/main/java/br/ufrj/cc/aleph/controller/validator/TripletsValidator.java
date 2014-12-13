@@ -16,10 +16,16 @@ public class TripletsValidator implements Validator {
 
 	public void validate( Object target, Errors errors ) {
 
+		TripletsForm form = ( TripletsForm ) target;
+
 		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email",
 				"field.required" );
 		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name",
 				"field.required" );
-	}
 
+		if ( form.getExamples().getSize() == 0 ) {
+
+			errors.rejectValue( "examples", "field.required" );
+		}
+	}
 }

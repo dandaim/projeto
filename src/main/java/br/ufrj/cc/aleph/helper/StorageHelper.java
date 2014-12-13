@@ -62,7 +62,7 @@ public class StorageHelper {
 			}
 
 			out.println( " halt.\"" );
-			out.println( " yap <<< $string > result.out" );
+			out.println( " yap <<< $string > " + folder + "/result.out" );
 			out.close();
 
 		} catch ( IOException e ) {
@@ -80,7 +80,8 @@ public class StorageHelper {
 	}
 
 	public static String generateFileRdf( final String folder,
-			final String UUID, final String target ) throws Exception {
+			final String UUID, final String target, final String mode )
+			throws Exception {
 
 		try {
 
@@ -114,7 +115,7 @@ public class StorageHelper {
 
 			outProlog.close();
 
-			FileWriter outFile = new FileWriter( folder + "/script.sh" );
+			FileWriter outFile = new FileWriter( folder + "/script-prolog.sh" );
 			PrintWriter out = new PrintWriter( outFile );
 
 			out.print( "string=\"['" + folder + "/prolog.pl']." );
@@ -128,14 +129,13 @@ public class StorageHelper {
 					+ "} -> Executando o script: gerador de resultado do rdf" );
 
 			ProcessBuilder pb = new ProcessBuilder( "/bin/bash", folder
-					+ "/script.sh" );
+					+ "/script-prolog.sh" );
 
 			Process p = pb.start();
 
 			synchronized ( p ) {
 
 				p.waitFor();
-
 			}
 
 			BufferedReader br = new BufferedReader( new FileReader( folder
@@ -143,15 +143,15 @@ public class StorageHelper {
 
 			String sCurrentLine;
 
-			String regularExpression = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)[a-zA-Z0-9/-]*#";
+			String regularExpression = "(http[s]?://|ftp://)?((www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)|(localhost))[a-zA-Z0-9/-]*#";
 
-			String regularExpressionUrl = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br|de)[a-zA-Z0-9-\\./-]*";
+			String regularExpressionUrl = "(http[s]?://|ftp://)?((www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br|de)|(localhost))[a-zA-Z0-9-\\./-]*";
 
 			String regularExpressionNumber = "[0-9-\\.]+_[a-zA-Z]+";
 
 			String regularExpressionStringNumber = "[a-zA-Z_]+[0-9-\\.]+";
 
-			FileWriter result = new FileWriter( folder + "/result-fixed.out" );
+			FileWriter result = new FileWriter( folder + "/result-fixed.b" );
 			PrintWriter outResult = new PrintWriter( result );
 
 			Map<String, List<String>> mapLines = new HashMap<String, List<String>>();
@@ -224,6 +224,18 @@ public class StorageHelper {
 
 			}
 
+			outResult.println( ":- set(minpos,2)." );
+			outResult.println( ":- modeh(*, " + target + "(+" + mode + "))." );
+			outResult.println( ":- modeb(*, " + target + "(+" + mode + "))." );
+			outResult.println( ":- modeb(*, " + target + "(-" + mode + "))." );
+
+			for ( Entry<String, List<String>> entry : mapLines.entrySet() ) {
+
+				outResult.println( ":- determination(" + target + "/1, "
+						+ entry.getKey() + "/2)." );
+
+			}
+
 			for ( Entry<String, List<String>> entry : mapLines.entrySet() ) {
 
 				for ( String line : entry.getValue() ) {
@@ -276,13 +288,45 @@ public class StorageHelper {
 
 	public static void main( String[] args ) {
 
-		String regularExpressionUrl = "\\.";
+		String regularExpressionUrl = "(http[s]?://|ftp://)?((www\\.)?[a-zA-Z0-9-\\.]+\\.(com|org|net|mil|edu|ca|co.uk|com.au|gov|br)|(localhost))[a-zA-Z0-9/-]*#";
 
-		String value = "comment(topic,literal(type(string,rule:_every_requirement_refers_to_exact_one_topic.))).";
+		String value = "http://localhost/foo#hasRank(http://localhost/foo#card0,http://localhost/foo#king).";
 
-		value = value.replaceAll( "\\:", "" );
+		value = value.replaceAll( regularExpressionUrl, "" );
 
-		System.out.println( value + "." );
+		System.out.println( value );
 
+	}
+
+	public static String generateTemplateRdf( String name, String email,
+			String folder ) {
+
+		try {
+
+			FileWriter outFile = new FileWriter( folder + "/script.sh" );
+			PrintWriter out = new PrintWriter( outFile );
+
+			out.print( "string=\"cd('" + alephPath + "\')." );
+			out.print( " [aleph]." );
+			out.print( " cd('" + folder + "')." );
+
+			out.print( " read_all('result-fixed')." );
+			out.print( " induce." );
+
+			out.println( " halt.\"" );
+			out.println( " yap <<< $string > " + folder + "/result.out" );
+			out.close();
+
+		} catch ( IOException e ) {
+
+			System.out
+					.println( "Erro na classe StorageHelper no método generateTemplate" );
+
+			System.out.println( "Erro: " + e.getMessage() );
+			e.printStackTrace();
+
+		}
+
+		return folder + "/script.sh";
 	}
 }
