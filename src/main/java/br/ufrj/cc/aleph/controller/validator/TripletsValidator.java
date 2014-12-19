@@ -22,10 +22,21 @@ public class TripletsValidator implements Validator {
 				"field.required" );
 		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name",
 				"field.required" );
+		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "target",
+				"field.required" );
 
 		if ( form.getExamples().getSize() == 0 ) {
 
 			errors.rejectValue( "examples", "field.required" );
+		}
+
+		if ( form.getOption().equals( "url" ) ) {
+
+			ValidationUtils.rejectIfEmptyOrWhitespace( errors, "url",
+					"field.required" );
+		} else if ( form.getFile().getSize() == 0 ) {
+
+			errors.rejectValue( "file", "field.required" );
 		}
 	}
 }

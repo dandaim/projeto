@@ -10,32 +10,44 @@ import br.ufrj.cc.aleph.controller.form.BeaconForm;
 
 @Component
 public class BeaconValidator implements Validator {
-	
-	public boolean supports( Class<?> arg0 ) {		
+
+	public boolean supports( Class<?> arg0 ) {
 		return BeaconForm.class.isAssignableFrom( arg0 );
 	}
-	
+
 	public void validate( Object target, Errors errors ) {
-		
-		BeaconForm form = (BeaconForm) target;
-		
-		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "field.required" );
-		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "field.required" );
-		
-		if( form.getArqb().getSize() == 0 ) {
+
+		BeaconForm form = ( BeaconForm ) target;
+
+		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email",
+				"field.required" );
+		ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name",
+				"field.required" );
+
+		if ( form.getArqb().getSize() == 0 ) {
 			errors.rejectValue( "arqb", "field.required" );
 		}
-		
+
 		Long size = 0L;
-		
-		for( CommonsMultipartFile file : form.getArqpos() ) {
+
+		for ( CommonsMultipartFile file : form.getArqpos() ) {
 			size += file.getSize();
 		}
-		
-		if( size == 0 ) {
+
+		if ( size == 0 ) {
 			errors.rejectValue( "arqpos", "field.required" );
 		}
-		
+
+		Long sizeNeg = 0L;
+
+		for ( CommonsMultipartFile file : form.getArqneg() ) {
+			sizeNeg += file.getSize();
+		}
+
+		if ( sizeNeg == 0 ) {
+			errors.rejectValue( "arqneg", "field.required" );
+		}
+
 	}
 
 }

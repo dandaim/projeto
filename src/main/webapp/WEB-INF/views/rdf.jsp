@@ -84,9 +84,8 @@
 							<div class="form-group">
 								<label for="examples" class="col-sm-1 control-label">Examples file<span class="glyphicon glyphicon-info-sign" title="Load your examples here."></span></label>
 								<div class="col-sm-5">
-									<form:input id="examples" type="file" value="Choose Value" name="examples" path="examples" />
-									
-									<form:errors path="file" cssClass="error" />
+									<form:input id="examples" type="file" value="Choose Value" name="examples" path="examples" />									
+									<form:errors path="examples" cssClass="error" />
 								</div>							
 							</div>
 							<div class="form-group" >

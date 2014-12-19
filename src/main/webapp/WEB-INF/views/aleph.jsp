@@ -36,7 +36,7 @@
 					<c:if test="${not empty msg}">
 						<div class="alert alert-${msgType}" role="alert">${msg}</div>	
 					</c:if>	
-					<form:form method="post" action="${context}/home/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
+					<form:form method="post" action="${context}/aleph/request" class="form-horizontal" modelAttribute="beaconForm" enctype="multipart/form-data" >
 						<div class="form-group" >
 							<label for="email" class="col-sm-2 control-label">Email</label>
 							<div class="col-sm-5">
@@ -87,8 +87,10 @@
 								<form:input class="files" type="file" value="Choose Value" name="arqneg[]" path="arqneg" />
 								<form:input class="files" type="file" value="Choose Value" name="arqneg[]" path="arqneg" />
 								<form:input class="files" type="file" value="Choose Value" name="arqneg[]" path="arqneg" />
+								<form:errors path="arqneg" cssClass="error" />
 							</div>							
 						</div>
+						  
 						<div class="form-group" id="optional">
 							<label class="col-sm-2 control-label">Optional files<span class="glyphicon glyphicon-info-sign" title="Load optional files here. Maximum of 10 files." ></span>
 							</label>
@@ -105,6 +107,7 @@
 								<form:input type="file" class="files-opt" name="arqopt[]" value="Choose Value" path="arqopt" />
 							</div>
 						</div>
+						
 						<div class="form-group">
 							<div class="col-sm-10 col-sm-offset-2">
 								<input type="button" id="btnadd" class="btn btn-primary" value="Add files" />

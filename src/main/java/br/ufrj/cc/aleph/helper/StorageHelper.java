@@ -56,8 +56,7 @@ public class StorageHelper {
 			// Adicionando leitura de todos os arquivos na execução do script
 			for ( int i = 0; i < numFiles; i++ ) {
 
-				out.print( " read_all(arqb" + i + ", arqpos" + i + ", arqneg"
-						+ i + ")." );
+				out.print( " read_all(arq" + i + ")." );
 				out.print( " induce." );
 			}
 

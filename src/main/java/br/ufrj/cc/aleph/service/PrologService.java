@@ -117,8 +117,7 @@ public class PrologService {
 
 		LOGGER.info( "{" + UUID + "} -> Criando arquivo B: " + beaconForm );
 
-		File arquivo = new File( pathFolder + "/"
-				+ beaconForm.getArqb().getName() + index + ".b" );
+		File arquivo = new File( pathFolder + "/" + "arq" + index + ".b" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -129,8 +128,8 @@ public class PrologService {
 		InputStream input = beaconForm.getArqb().getInputStream();
 
 		conteudo += getStringFromInputStream( input, UUID );
-		conteudo += "\n:- set(test_pos,'arqpos" + index + ".f').";
-		conteudo += "\n:- set(test_neg,'arqneg" + index + ".n').";
+		// conteudo += "\n:- set(test_pos,'arqpos" + index + ".f').";
+		// conteudo += "\n:- set(test_neg,'arqneg" + index + ".n').";
 
 		input.close();
 
@@ -164,8 +163,7 @@ public class PrologService {
 
 		LOGGER.info( "{" + UUID + "} -> Criando folds positivos: " + beaconForm );
 
-		File arquivo = new File( pathFolder + "/"
-				+ beaconForm.getArqpos()[index].getName() + index + ".f" );
+		File arquivo = new File( pathFolder + "/" + "arq" + index + ".f" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -209,8 +207,7 @@ public class PrologService {
 
 		LOGGER.info( "{" + UUID + "} -> Criando folds negativos: " + beaconForm );
 
-		File arquivo = new File( pathFolder + "/"
-				+ beaconForm.getArqneg()[index].getName() + index + ".n" );
+		File arquivo = new File( pathFolder + "/" + "arq" + index + ".n" );
 		arquivo.createNewFile();
 
 		FileWriter fw = new FileWriter( arquivo.getAbsolutePath() );
@@ -237,7 +234,7 @@ public class PrologService {
 
 		if ( conteudo.length() == 0 ) {
 
-			InputStream input = beaconForm.getArqpos()[index].getInputStream();
+			InputStream input = beaconForm.getArqneg()[index].getInputStream();
 
 			conteudo += getStringFromInputStream( input, UUID );
 
